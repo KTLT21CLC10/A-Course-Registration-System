@@ -1,8 +1,8 @@
 Final Project - Programing Technique - A Course Registration System
-Group member: 
++ Group member: 
 - 20127195 Lương Gia Hy
 - 20127498 Nguyễn Văn Hiếu
-Assignment Plan
++ Assignment Plan
 - Lương Gia Hy:
 1. Log in staff
 2. View info staff
