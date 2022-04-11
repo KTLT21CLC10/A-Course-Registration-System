@@ -26,7 +26,7 @@ struct Mark
 
 struct Data
 {
-	string StudentID, FirstName, Name;
+	string Name, FirstName, StudentID, Pass, Sex, DOB, ID;
 	int j, k;
 	Data* pNext;
 	Mark Score;
@@ -59,7 +59,7 @@ struct Semester
 {
 	Course* pCourse = nullptr;
 	string StartSem;
-	Date StartReg, EndReg, EndSem;;
+	Date StartReg, EndReg, EndSem;
 };
 
 struct Schoolyear
@@ -75,29 +75,35 @@ void gotoxy(int x, int y);
 
 void clear();
 
-void InputYourAcc(string& username, string& Pass);
+void InputAccount(string& name, string& Pass);
 
-void AddNewYear(Schoolyear*& NewYear);
+void AddYear(Schoolyear*& Ny);
 
-void InputStaff(Teacher*& Staff, int& NumOfStaff);
+//void AddClass(Schoolyear* Year);
+//
+//void GetInfoStu(Schoolyear* Year);
 
-int CheckLogin(string username, string Pass, Schoolyear*& YearCur, Teacher* Staff, int NumOfStaff);
+void InputStaff(Teacher*& S, int& NumOfS);
 
-void ViewInfo(int x, Schoolyear* YearCur, Teacher* Staff);
+int CheckLogin(string username, string Pass, Schoolyear*& Year, Teacher* S, int NumOfS);
 
-void ChangePass(Schoolyear* YearCur, Teacher* Staff, int x, int NumOfStaff);
+void ViewIn(int x, Schoolyear* Year, Teacher* Staff);
 
-void AddNewSemester(Schoolyear*& YearCur, int& x);
+void ChangePass(Schoolyear* Year, Teacher* Staff, int x, int NumOfStaff);///
 
-void AddNewCourse(Course*& CourseHead);
+void AddSem(Schoolyear*& Year, int& x);
 
-void ViewCourse(Course* CourseHead, int& t, int& i);
+void CreateCourse(Schoolyear*& Year, int& x);
 
-void UpdateCourse(Schoolyear* YearCur, int sem);
+void AddCou(Course*& Cou);
 
-void SaveInfoCourse(Schoolyear* YearCur, int sem);
+void ViewCou(Course* Cou, int& t, int& i);//
 
-void DeleteCourse(Schoolyear*& YearCur, int sem);
+void UpdateCou(Schoolyear* Year, int Se);
+
+void SaveInfoCou(Schoolyear* Year, int Se);
+
+void DeleteCou(Schoolyear*& Year, int Se);
 
 void Now(Date& Today);
 

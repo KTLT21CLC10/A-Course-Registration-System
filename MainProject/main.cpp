@@ -13,7 +13,7 @@ int main()
 	do
 	{
 		Now(Today);
-		InputYourAcc(username, password);
+		InputAccount(username, password);
 		int x = CheckLogin(username, password, YearCur1, Staff, NumOfStaff);
 		if (x == 0)
 		{
@@ -28,12 +28,13 @@ int main()
 		}
 		string* str1;
 		int k;
-		if (x < 100)k = 9;
+		if (x < 100)k = 10;
 		else
 		{
-			if (CheckDateRegister(Today, YearCur2->Sem[sem].StartReg, YearCur2->Sem[sem].EndReg)) k = 6;
+			k = 9;
+			/*if (CheckDateRegister(Today, YearCur2->Sem[sem].StartReg, YearCur2->Sem[sem].EndReg)) k = 6;
 			else k = 4;
-			if (CheckImport(YearCur1, x)) k = 5;
+			if (CheckImport(YearCur1, x)) k = 5;*/
 		}
 		str1 = new string[k];
 		str1[0] = "Log out";
@@ -41,23 +42,22 @@ int main()
 		str1[2] = "Change password";
 		if (x < 100)
 		{
-			str1[3] = "Add new year";
-			str1[4] = "Add new semester";
-			str1[5] = "Course";
-			str1[6] = "View classes in a year";
-			str1[7] = "View students in a class";
-			str1[8] = "View students in a course";
+			str1[3] = "Add new year and load information of student";
+			str1[4] = "Create semester";
+			str1[5] = "Create course and load information of course";
+			str1[6] = "Add a course";
+			str1[7] = "View list of courses";
+			str1[8] = "Update course";
+			str1[9] = "Delete course";
 		}
 		else
 		{
-			if (CheckDateRegister(Today, YearCur2->Sem[sem].StartReg, YearCur2->Sem[sem].EndReg))
-			{
-				str1[3] = "Register course";
-				str1[4] = "View list of enrolled courses";
-				str1[5] = "Remove a course from the enrolled list";
-			}
-			else str1[3] = "View course registered";
-			if (CheckImport(YearCur1, x)) str1[4] = "View your scoreboard";
+			str1[3] = "Course Registration";
+			str1[4] = "View list of your courses";
+			str1[5] = "View list of class";
+			str1[6] = "View list of students in class";
+			str1[7] = "View list of course";
+			str1[8] = "View list of students in a course";
 		}
 		int option1 = 1;
 		while (option1 != 0)
@@ -73,13 +73,13 @@ int main()
 				case 1:
 				{
 					system("cls");
-					ViewInfo(x, YearCur1, Staff);
+					ViewIn(x, YearCur1, Staff);
 					break;
 				}
 				case 2:
 				{
 					system("cls");
-					ChangePass(YearCur1, Staff, x, NumOfStaff);
+					ChangePass(YearCur1, Staff, x, NumOfStaff);  
 					break;
 				}
 				case 3:
@@ -89,23 +89,38 @@ int main()
 					{
 						if (YearHead == nullptr)
 						{
-							AddNewYear(YearHead);
+							AddYear(YearHead);
 							YearCur1 = YearHead;
 						}
 						else
 						{
-							AddNewYear(YearCur1->YearNext);
+							AddYear(YearCur1->YearNext);
 							YearCur1 = YearCur1->YearNext;
 						}
 					}
 					else
 					{
-						if (CheckDateRegister(Today, YearCur2->Sem[sem].StartReg, YearCur2->Sem[sem].EndReg))
-							CourseEnroll(YearCur1, YearCur2->Sem[sem].pCourse, x, YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].NumOfOpt);
-						else
-						{
-							int t, i;
-							ViewCourse(YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered, t, i);
+						int choice;
+						while (true) {
+							cout << "1. Enroll in a course" << endl;
+							cout << "2. View list of enrolled course" << endl;
+							cout << "3. Remove a course from enrolled list" << endl;
+							cout << "0. Back" << endl;
+							cout << "Enter your choice: ";
+							cin >> choice;
+							if (choice == 1) {
+								CourseEnroll(YearCur1, YearCur2->Sem[sem].pCourse, x, YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].NumOfOpt);
+							}
+							else if (choice == 2) {
+								int t, i;
+								ViewCou(YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered, t, i);
+							}
+							else if (choice == 3) {
+								RemoveCourseEnrolled(YearCur1, YearCur2->Sem[sem].pCourse, x);
+							}
+							else {
+								break;
+							}
 						}
 					}
 					break;
@@ -116,12 +131,12 @@ int main()
 					if (x < 100)
 					{
 						YearCur2 = YearHead;
-						AddNewSemester(YearCur2, sem);
+						AddSem(YearCur2, sem);
 					}
 					else
 					{
 						int t, i;
-						ViewCourse(YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered, t, i);
+						ViewCou(YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered, t, i);
 					}
 					break;
 				}
@@ -130,116 +145,56 @@ int main()
 					system("cls");
 					if (x < 100)
 					{
-						int t;
-						string* str2;
 						if (CheckDateEndSemester(Today, YearCur2->Sem[sem].EndSem))
-							t = 10;
+							CreateCourse(YearCur2, sem);
 						else
-							t = 5;
-						str2 = new string[t];
-						str2[0] = "Back";
-						str2[1] = "Add new course";
-						str2[2] = "View list of course";
-						str2[3] = "Update course information";
-						str2[4] = "Delete a course";
-						if (CheckDateEndSemester(Today, YearCur2->Sem[sem].EndSem))
-						{
-							str2[5] = "Export list of students  in a course";
-							str2[6] = "Import the scoreboard of a course";
-							str2[7] = "View the scoreboard of a course";
-							str2[8] = "Update a student result";
-							str2[9] = "View the scoreboard of a class";
-						}
-						int option2 = 1;
-						while (option2 != 0)
-						{
-							for (int i = 1; i < t; i++) {
-								cout << i << ". " << str2[i] << endl;
-							}
-							cout << "0. " << str2[0] << endl;
-							cout << "Input your option: ";
-							cin >> option2;
-							switch (option2)
-							{
-								case 1:
-								{
-									system("cls");
-									AddNewCourse(YearCur2->Sem[sem].pCourse);
-									break;
-								}
-								case 2:
-								{
-									system("cls");
-									int t;
-									ViewCourse(YearCur2->Sem[sem].pCourse, t, t);
-									break;
-								}
-								case 3:
-								{
-									system("cls");
-									UpdateCourse(YearCur2, sem);
-									break;
-								}
-								case 4:
-								{
-									system("cls");
-									DeleteCourse(YearCur2, sem);
-									break;
-								}
-								case 5:
-								{
-									system("cls");
-									ExportListStudentCourse(YearCur2->Sem[sem].pCourse);
-									break;
-								}
-								case 6:
-								{
-									system("cls");
-									LoadScoreboard(YearCur2->Sem[sem].pCourse, YearHead);
-									break;
-								}
-								case 7:
-								{
-									system("cls");
-									ViewScoreboardCourse(YearCur2->Sem[sem].pCourse);
-									break;
-								}
-								case 8:
-								{
-									system("cls");
-									break;
-								}
-								case 9:
-								{
-									system("cls");
-									break;
-								}
-							}
-						}
-						delete[]str2;
+							cout << "Your date end semester is invalid!!!" << endl;
 					}
 					else
 					{
-						RemoveCourseEnrolled(YearCur1, YearCur2->Sem[sem].pCourse, x);
+						ViewListClasses(YearHead);
 					}
 					break;
 				}
 				case 6:
 				{
 					system("cls");
-					ViewListClasses(YearHead);
+					if (x < 100) {
+						AddCou(YearCur2->Sem[sem].pCourse);
+					}
+					else {
+						ViewListStudentInClass(YearHead);
+					}
 					break;
 				}
 				case 7:
 				{
 					system("cls");
-					ViewListStudentInClass(YearHead);
+					if (x < 100) {
+						int t;
+						ViewCou(YearCur2->Sem[sem].pCourse, t, t);
+					}
+					else {
+						int t;
+						ViewCou(YearCur2->Sem[sem].pCourse, t, t);
+					}
 					break;
 				}
 				case 8:
 				{
 					system("cls");
-					ViewListStudentInCourse(YearCur2, sem);
+					if (x < 100) {
+						UpdateCou(YearCur2, sem);
+					}
+					else {
+						ViewListStudentInCourse(YearCur2, sem);
+					}
+					break;
+				}
+				case 9:
+				{
+					system("cls");
+					DeleteCou(YearCur2, sem);
 					break;
 				}
 				case 0:
