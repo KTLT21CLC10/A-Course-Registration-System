@@ -287,7 +287,7 @@ void CreateCourse(Schoolyear*& Year, int& x)
 			Cur->NumOfStu = 0;
 			Cur->pNext = nullptr;
 		}
-		cout << "Input successfully.";
+		cout << "Input successfully." << endl << endl;
 	}
 }
 

@@ -65,7 +65,7 @@ struct Semester
 struct Schoolyear
 {
 	Semester Sem[3];
-	string NumOfYear = ""; // nam hoc
+	string NumOfYear = ""; 
 	Class* CLass;
 	Schoolyear* YearNext;
 	int NumOfClass;
@@ -78,10 +78,6 @@ void clear();
 void InputAccount(string& name, string& Pass);
 
 void AddYear(Schoolyear*& Ny);
-
-//void AddClass(Schoolyear* Year);
-//
-//void GetInfoStu(Schoolyear* Year);
 
 void InputStaff(Teacher*& S, int& NumOfS);
 
