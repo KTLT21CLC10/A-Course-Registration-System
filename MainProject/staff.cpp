@@ -296,7 +296,8 @@ void AddCou(Course*& Cou)
 	Course* temp = new Course;
 	temp->NumOfStu = 0;
 	cout << "Please enter course ID: ";
-	getline(cin, temp->CourseID);
+	cin >> temp->CourseID;
+	cin.ignore();
 
 	cout << "Please enter Name of course: ";
 	getline(cin, temp->NameOfCourse);
@@ -321,7 +322,7 @@ void AddCou(Course*& Cou)
 
 	temp->pNext = Cou;
 	Cou = temp;
-	cout << "Add new course successfully";
+	cout << "Add new course successfully" << endl;
 }
 
 void ViewCou(Course* Cou, int& t, int& i)
