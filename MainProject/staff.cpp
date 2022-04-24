@@ -84,9 +84,9 @@ int loginSystem(string username, string password, Schoolyear*& year, Staff* staf
 
 void viewInfo(int user, Schoolyear* year, Staff* staff) {
 	if (user < 0) {
-		cout << "Full Name: " << staff[-1 * (user + 1)].firstName << " " << staff[-1 * (user + 1)].lastName << endl;
-		cout << "Gender: " << staff[-1 * (user + 1)].gender << endl;
-		cout << "Email: " << staff[-1 * (user + 1)].email << endl;
+		cout << "Full Name: " << staff[(-1 * user) - 1].firstName << " " << staff[(-1 * user) - 1].lastName << endl;
+		cout << "Gender: " << staff[(-1 * user) - 1].gender << endl;
+		cout << "Email: " << staff[(-1 * user) - 1].email << endl;
 	}
 	else {
 		cout << "Full Name: " << year->Class[user - 1].student[user - 1].firstName << " " << year->Class[user - 1].student[user - 1].lastName << endl;
@@ -115,7 +115,7 @@ void changePass(int user, Schoolyear* year, Staff* staff, int numOfStaff) {
 		}
 	}
 	if (user < 0) {
-		staff[-1 * (user - 1)].pass = pass;
+		staff[(-1 * user) - 1].pass = pass;
 	}
 	else {
 		year->Class[user - 1].student[user - 1].pass = pass;
