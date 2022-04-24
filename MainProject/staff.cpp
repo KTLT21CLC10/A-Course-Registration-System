@@ -357,14 +357,14 @@ void createCourseRegistration(Schoolyear*& year, int& semester) {
 	cin.ignore();
 	semester--;
 	while (true) {
-		cout << "Enter start date of this semester: " << endl;
+		cout << "Enter again start date of this semester you created: " << endl;
 		cout << "Enter start day: ";
 		cin >> year->semester[semester].startDate.day;
 		cout << "Enter start month: ";
 		cin >> year->semester[semester].startDate.month;
 		cout << "Enter start year: ";
 		cin >> year->semester[semester].startDate.year;
-		cout << "Enter end date of this semester: " << endl;
+		cout << "Enter again end date of this semester you created: " << endl;
 		cout << "Enter end day: ";
 		cin >> year->semester[semester].endDate.day;
 		cout << "Enter end month: ";
