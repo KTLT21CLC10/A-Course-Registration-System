@@ -57,6 +57,7 @@ struct Schoolyear
 	Class* Class;
 	Schoolyear* yearNext;
 	int numOfClass;
+	Course courseRegis[3];
 };
 
 void gotoxy(int, int);
@@ -81,7 +82,13 @@ void createNewClass(Class*&, int&);
 
 void loadInfoStudent(Schoolyear*&);
 
+bool checkDateSemester(Schoolyear*&, int&);
+
 void createSemester(Schoolyear*&, int&);
+
+bool checkDateRegis1(Schoolyear*&, int&);
+
+bool checkDateRegis2(Schoolyear*&, int&);
 
 void createCourseRegistration(Schoolyear*&, int&);
 
