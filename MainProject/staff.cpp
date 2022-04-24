@@ -1,9 +1,11 @@
-﻿#include "staff.h"
+﻿#include "Header.h"
 #include <string>
+#include <fstream>
+#include <windows.h>
+#include <conio.h>
 using namespace std;
 
-void gotoxy(int x, int y)
-{
+void gotoxy(int x, int y) {
 	static HANDLE h = NULL;
 	if (!h)
 		h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -11,326 +13,345 @@ void gotoxy(int x, int y)
 	SetConsoleCursorPosition(h, c);
 }
 
-void clear()
-{
-	for (int i = 0; i < 118; ++i) {
-		for (int j = 3; j < 39; ++j)
-		{
-			gotoxy(i, j);
-			cout << char(32);
+void inputAccount(string& username, string& password) {
+	cout << "Enter your username: ";
+	cin >> username;
+	cout << "Enter your password: ";
+	cin >> password;
+	cout << endl;
+}
+
+void loadInfoStaff(Staff*& staff, int& numOfStaff) {
+	ifstream fin("StaffAccount.csv");
+	string temp;
+	getline(fin, temp, ',');
+	numOfStaff = stoi(temp);
+	staff = new Staff[stoi(temp)];
+	getline(fin, temp);
+	for (int i = 0; i < numOfStaff; i++) {
+		getline(fin, staff[i].firstName, ',');
+		getline(fin, staff[i].lastName, ',');
+		getline(fin, staff[i].gender, ',');
+		getline(fin, staff[i].email, ',');
+		getline(fin, staff[i].user, ',');
+		getline(fin, staff[i].pass);
+	}
+}
+
+bool checkUserStaff(string username) {
+	for (int i = 0; i < username.size(); i++) {
+		if (username[i] < 'a' || username[i] > 'z') {
+			return false;
 		}
 	}
-	cout << endl;
+	return true;
 }
 
-void InputAccount(string& Name, string& Pass)
-{
-	cout << "Please enter your username: ";
-	cin >> Name;
-	cout << "Please enter your password: ";
-	cin >> Pass;
-	cout << endl;
+bool checkUserStudent(string username) {
+	for (int i = 0; i < username.size(); i++) {
+		if ((username[i] <= 48 || username[i] >= 57) && username.size() != 8) {
+			return false;
+		}
+	}
+	return true;
 }
 
-void AddYear(Schoolyear*& Year) 
-{
-	if (!Year) Year = new Schoolyear;
-	cout << "Input school year: ";
-	cin >> Year->NumOfYear;
-	cout << endl;
-	cout << "Input number of classes: ";
-	cin >> Year->NumOfClass;
+int loginSystem(string username, string password, Schoolyear*& year, Staff* staff, int numOfStaff) {
+	if (checkUserStaff(username)) {
+		for (int i = 0; i < numOfStaff; i++) {
+			if (username == staff[i].user && password == staff[i].pass) {
+				cout << "Log in successfully!!!" << endl;
+				cout << "Hello " << staff[i].firstName << " " << staff[i].lastName << "!!!" << endl;
+				cout << "Welcome you to my course tragistation system!!!" << endl << endl;
+				return -(i + 1);
+			}
+		}
+	}
+	else if (checkUserStudent(username)) {
+		for (int i = 0; i < year->numOfClass; i++) {
+			for (int j = 0; j < year->Class[i].numOfStudent; j++) {
+				if (username == year->Class[i].student[j].StudentID && password == year->Class[i].student[j].pass) {
+					cout << "Log in successfully!!!" << endl;
+					cout << "Hello " << year->Class[i].student[j].firstName << " " << year->Class[i].student[j].lastName << "!!!" << endl;
+					cout << "Welcome you to my course tragistation system!!!" << endl << endl;;
+					return (i + 1);
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+void viewInfo(int user, Schoolyear* year, Staff* staff) {
+	if (user < 0) {
+		cout << "Full Name: " << staff[-1 * (user - 1)].firstName << " " << staff[-1 * (user - 1)].lastName << endl;
+		cout << "Gender: " << staff[-1 * (user - 1)].gender << endl;
+		cout << "Email: " << staff[-1 * (user - 1)].email << endl;
+	}
+	else {
+		cout << "Full Name: " << year->Class[user - 1].student[user - 1].firstName << " " << year->Class[user - 1].student[user - 1].lastName << endl;
+		cout << "Class: " << year->Class[user - 1].nameOfClass << endl;
+		cout << "Student ID: " << year->Class[user - 1].student[user - 1].StudentID << endl;
+		cout << "Gender: " << year->Class[user - 1].student[user - 1].gender << endl;
+		cout << "Date of Birth: " << year->Class[user - 1].student[user - 1].dateOfBirth << endl;
+		cout << "Social ID: " << year->Class[user - 1].student[user - 1].SocialID << endl;
+	}
+}
+
+void changePass(int user, Schoolyear* year, Staff* staff, int numOfStaff) {
+	string pass, temp;
+	while (true) {
+		cout << "You want to change your password!!!" << endl;
+		cout << "Please enter your new password: ";
+		cin >> pass;
+		cout << "Please enter your new password: ";
+		cin >> temp;
+		if (temp != pass) {
+			cout << "Error!!! Your new password don't match. Please enter again." << endl;
+			pass = "";
+		}
+		else {
+			break;
+		}
+	}
+	if (user < 0) {
+		staff[-1 * (user - 1)].pass = pass;
+	}
+	else {
+		year->Class[user - 1].student[user - 1].pass = pass;
+	}
+	if (user < 0) {
+		ofstream fout("StaffAccount.csv", ios::trunc);
+		fout << numOfStaff << ",,,,," << endl;
+		for (int i = 0; i < numOfStaff; i++) {
+			fout << staff[i].firstName << "," << staff[i].lastName << "," << staff[i].gender << "," << staff[i].email << "," << staff[i].user << "," << staff[i].pass << endl;
+		}
+	}
+	else {
+		ofstream fout(year->Class[user - 1].nameOfClass + ".csv", ios::trunc);
+		fout << year->Class[user - 1].numOfStudent << ",,,,,,," << endl;
+		for (int i = 0; i < year->Class[user - 1].numOfStudent; i++) {
+			fout << year->Class[user - 1].student[user - 1].num << ","
+				<< year->Class[user - 1].student[user - 1].StudentID << ","
+				<< year->Class[user - 1].student[user - 1].firstName << ","
+				<< year->Class[user - 1].student[user - 1].lastName << ","
+				<< year->Class[user - 1].student[user - 1].gender << ","
+				<< year->Class[user - 1].student[user - 1].dateOfBirth << ","
+				<< year->Class[user - 1].student[user - 1].SocialID << ","
+				<< year->Class[user - 1].student[user - 1].pass << endl;
+		}
+	}
+	cout << "Your password was changed successfully!!!" << endl << endl;
+}
+
+void createNewYear(string schoolyear) {
+	cout << "Enter your new school year: ";
+	cin >> schoolyear;
+	ofstream fout(schoolyear + ".csv");
+	cout << "Create new school year successfully!!!" << endl;
+}
+
+void createNewClass(Class*& classes, int& numOfClass) {
+	cout << "Enter number of class you want to create: ";
+	cin >> numOfClass;
+	classes = new Class[numOfClass];
+	cout << "Enter name of classes you want to create: " << endl;
+	for (int i = 0; i < numOfClass; i++) {
+		cout << "Enter class " << i + 1 << ": ";
+		cin >> classes[i].nameOfClass;
+		ofstream fout(classes[i].nameOfClass + ".csv");
+		cout << "Class " << classes[i].nameOfClass << " was created successfully!!!" << endl;
+	}
+}
+
+void loadInfoStudent(Schoolyear*& year) {
+	if (year == NULL) {
+		year = new Schoolyear;
+	}
+	while (true) {
+		cout << "Enter your school year you created: ";
+		cin >> year->schoolYear;
+		ifstream fin(year->schoolYear + ".csv");
+		if (fin.is_open()) {
+			break;
+		}
+		else {
+			cout << "Your school year has not been created!!!" << endl;
+		}
+	}
+	cout << "Enter number of classes you want to load info: ";
+	cin >> year->numOfClass;
 	cin.ignore();
-	Year->CLass = new Class[Year->NumOfClass];
-	for (int i = 0; i < Year->NumOfClass; i++)
-	{
-		while (true)
-		{
-			cout << "Input name of the class: ";
-			getline(cin, Year->CLass[i].NameOfClass);
-			ifstream in(Year->CLass[i].NameOfClass + ".csv");
-			if (in.is_open()) break;
-			else
-			{
-				cout << "Can not open files to load data!!!";
+	year->Class = new Class[year->numOfClass];
+	for (int i = 0; i < year->numOfClass; i++) {
+		while (true) {
+			cout << "Enter name of the classes: ";
+			getline(cin, year->Class[i].nameOfClass);
+			ifstream fin(year->Class[i].nameOfClass + ".csv");
+			if (fin.is_open()) {
+				break;
+			}
+			else {
+				cout << "Your class has not been created!!!" << endl;
 			}
 		}
 		string temp;
-		ifstream in(Year->CLass[i].NameOfClass + ".csv");
-		getline(in, temp, ',');
-		Year->CLass[i].NumOfStudent = stoi(temp);
-		Year->CLass[i].Stu = new Student[stoi(temp)];
-		getline(in, temp);
-		for (int j = 0; j < Year->CLass[i].NumOfStudent; j++)
-		{
-			getline(in, Year->CLass[i].Stu[j].Num, ',');
-			getline(in, Year->CLass[i].Stu[j].StudentID, ',');
-			getline(in, Year->CLass[i].Stu[j].FirstName, ',');
-			getline(in, Year->CLass[i].Stu[j].Name, ',');
-			getline(in, Year->CLass[i].Stu[j].Sex, ',');
-			getline(in, Year->CLass[i].Stu[j].DOB, ',');
-			getline(in, Year->CLass[i].Stu[j].ID, ',');
-			getline(in, Year->CLass[i].Stu[j].Pass);
-			Year->CLass[i].Stu[j].Registered = nullptr;
+		ifstream fin(year->Class[i].nameOfClass + ".csv");
+		if (fin.peek() == std::ifstream::traits_type::eof()) {
+			cout << "No information to load!!! Please choose another class" << endl;
 		}
-		cout << "Load data of class " << Year->CLass[i].NameOfClass << " successfully" << endl;
+		else {
+			getline(fin, temp, ',');
+			year->Class[i].numOfStudent = stoi(temp);
+			year->Class[i].student = new Student[stoi(temp)];
+			getline(fin, temp);
+			for (int j = 0; j < year->Class[i].numOfStudent; j++) {
+				getline(fin, year->Class[i].student[j].num, ',');
+				getline(fin, year->Class[i].student[j].StudentID, ',');
+				getline(fin, year->Class[i].student[j].firstName, ',');
+				getline(fin, year->Class[i].student[j].lastName, ',');
+				getline(fin, year->Class[i].student[j].gender, ',');
+				getline(fin, year->Class[i].student[j].dateOfBirth, ',');
+				getline(fin, year->Class[i].student[j].SocialID, ',');
+				getline(fin, year->Class[i].student[j].pass);
+				year->Class[i].student[j].enrolled = NULL;
+			}
+			cout << "Load information of class " << year->Class[i].nameOfClass << " successfully!!!" << endl;
+		}
 	}
-	Year->YearNext = nullptr;
+	year->yearNext = NULL;
 }
 
-int CheckLogin(string Name, string Pass, Schoolyear*& Year, Teacher* Staff, int NumOfStaff)
-{
-	if (Name[0] >= 'a' && Name[0] <= 'z')
-	{
-		int i = 0;
-		for (i; i < NumOfStaff; i++)
-		{
-			if (Name == Staff[i].Acc && Pass == Staff[i].Pass)
-				return i + 1;
-		}
-		return 0;
-	}
-	else if (Name[0] >= 'A' && Name[0] <= 'Z')
-		return 0; 
-	else if (Name[0] >= 48 && Name[0] <= 57 && Name.length() == 8)
-	{
-		if (Year == nullptr) return 0;
-		else
-		{
-			for (int i = 0; i < Year->NumOfClass; i++)
-				for (int j = 0; j < Year->CLass[i].NumOfStudent; j++)
-					if (Name == Year->CLass[i].Stu[j].StudentID && Year->CLass[i].Stu[j].Pass == Pass)
-						return (i + 1) * 100 + j + 1;
-			return 0;
-		}
-	}
-	else return 0;
-}
-
-void InputStaff(Teacher*& S, int& NumOfS){
-	ifstream in("StaffAcc.csv");
-	string temp;
-	getline(in, temp, ',');
-	NumOfS = stoi(temp);
-	S = new Teacher[stoi(temp)];
-	getline(in, temp);
-	for (int i = 0; i < NumOfS; i++)
-	{
-		getline(in, S[i].FirstName, ',');
-		getline(in, S[i].Name, ',');
-		getline(in, S[i].Sex, ',');
-		getline(in, S[i].Email, ',');
-		getline(in, S[i].Acc, ',');
-		getline(in, S[i].Pass);
-	}
-}
-
-void ViewIn(int x, Schoolyear* Year, Teacher* Staff)
-{
-	if (x < 100)
-	{
-		cout << "FullName: " << Staff[x - 1].FirstName << " " << Staff[x - 1].Name << endl;
-		cout << "Sex: " << Staff[x - 1].Sex << endl;
-		cout << "Email: " << Staff[x - 1].Email << endl;
-	}
-	else
-	{
-		cout << "FullName: " << Year->CLass[x / 100 - 1].Stu[x % 100 - 1].FirstName << Year->CLass[x / 100 - 1].Stu[x % 100 - 1].Name << endl;
-		cout << "Class: " << Year->CLass[x / 100 - 1].NameOfClass << endl;
-		cout << "Student ID: " << Year->CLass[x / 100 - 1].Stu[x % 100 - 1].StudentID << endl;
-		cout << "Date of Birth: " << Year->CLass[x / 100 - 1].Stu[x % 100 - 1].DOB << endl;
-		cout << "Sex: " << Year->CLass[x / 100 - 1].Stu[x % 100 - 1].Sex << endl;
-		cout << "Social ID: " << Year->CLass[x / 100 - 1].Stu[x % 100 - 1].ID << endl;
-		cout << "Pass" << Year->CLass[x / 100 - 1].Stu[x % 100 - 1].Pass << endl;
-	}
-}
-
-void ChangePass(Schoolyear* Year, Teacher* S, int x, int NumOfS)
-{
-	string Pass;
-	while (true)
-	{
-		cout << "Please enter your new Pass: ";
-		cin >> Pass;
-		cin.ignore();
-		cout << "Please enter your new Pass: ";
-		string temp;
-		getline(cin, temp);
-		if (temp != Pass)
-		{
-			cout << "Input error. Please input again your new Pass!!!" << endl;
-			Pass = "";
-		}
-		else break;
-	}
-	if (x < 100) S[x - 1].Pass = Pass;
-	else Year->CLass[x / 100 - 1].Stu[x % 100 - 1].Pass = Pass;
-	if (x < 100)
-	{
-		ofstream out("StaffAcc.csv", ios::trunc);
-		out << NumOfS << ",,,,," << endl;
-		for (int i = 0; i < NumOfS; i++)
-		{
-			out << S[i].FirstName << "," << S[i].Name << "," << S[i].Sex << "," << S[i].Email << "," << S[i].Acc << "," << S[i].Pass << endl;
-		}
-	}
-	else
-	{
-		ofstream out(Year->CLass[x / 100 - 1].NameOfClass + ".csv", ios::trunc);
-		out << Year->CLass[x / 100 - 1].NumOfStudent << ",,,,,,," << endl;
-		for (int i = 0; i < Year->CLass[x / 100 - 1].NumOfStudent; i++)
-		{
-			out << Year->CLass[x / 100 - 1].Stu[i].Num << "," << Year->CLass[x / 100 - 1].Stu[i].StudentID << "," << Year->CLass[x / 100 - 1].Stu[i].FirstName << ","
-				<< Year->CLass[x / 100 - 1].Stu[i].Name << "," << Year->CLass[x / 100 - 1].Stu[i].Sex << "," << Year->CLass[x / 100 - 1].Stu[i].DOB << ","
-				<< Year->CLass[x / 100 - 1].Stu[i].ID << "," << Year->CLass[x / 100 - 1].Stu[i].Pass << endl;
-		}
-	}
-	cout << "Your Pass was changed successfully." << endl;
-}
-
-void AddSem(Schoolyear*& Year, int& x)
-{
-	string temp;
-	cout << "Please enter school year: ";
-	cin >> temp;
+void createSemester(Schoolyear*& year, int& semester) {
+	string schoolYear;
+	cout << "Enter new school year: ";
+	cin >> schoolYear;
 	cout << endl;
-	while (Year && temp != Year->NumOfYear)
-	{
-		Year = Year->YearNext;
-	}
-	if (!Year)
-	{
-		cout << "This year is not valid. Please enter again: " << endl;
-		return;
-	}
-	cout << "Please enter semester: ";
-	cin >> x;
+	cout << "Enter new semester: ";
+	cin >> semester;
 	cin.ignore();
-	x = x - 1;
-	cout << "The form of date is dd/mm/yyyy." << endl;
-	cout << "Please enter start date of this semester: ";
-	getline(cin, Year->Sem[x].StartSem);
-	cout << endl;
-	cout << "Please enter end date of this semester: ";
-	getline(cin, temp);
-	cout << endl;
-	Year->Sem[x].EndSem.day = (int)temp[0] * 10 + (int)temp[1] - 528;
-	Year->Sem[x].EndSem.month = (int)temp[3] * 10 + (int)temp[4] - 528;
-	Year->Sem[x].EndSem.year = (int)temp[6] * 1000 + (int)temp[7] * 100 + (int)temp[8] * 10 + (int)temp[9] - 53328;
+	semester--;
+	cout << "Enter start date of this semester: " << endl;
+	cout << "Enter start day: "; 
+	cin >> year->semester[semester].startDate.day;
+	cout << "Enter start month: ";
+	cin >> year->semester[semester].startDate.month;
+	cout << "Enter start year: ";
+	cin >> year->semester[semester].startDate.year;
+	string startDateSem = year->semester[semester].startDate.day + "/" + year->semester[semester].startDate.month + "/" + year->semester[semester].startDate.year;
+	cout << "Start date of this semester is: " << startDateSem << endl;
+	cout << "Enter end date of this semester: " << endl;
+	cout << "Enter end day: ";
+	cin >> year->semester[semester].endDate.day;
+	cout << "Enter end month: ";
+	cin >> year->semester[semester].endDate.month;
+	cout << "Enter end year: ";
+	cin >> year->semester[semester].endDate.year;
+	string endDateSem = year->semester[semester].endDate.day + "/" + year->semester[semester].endDate.month + "/" + year->semester[semester].endDate.year;
+	cout << "End date of this semester is: " << endDateSem << endl;
+	ofstream fout(schoolYear + "_" + to_string(semester + 1) + ".csv");
+	cout << "Your semester was created successfully!!!" << endl;
 }
 
-void CreateCourse(Schoolyear*& Year, int& x)
-{
-	string temp;
+void createCourseRegistration(Schoolyear*& year, int& semester) {
+	string schoolYear;
 	cout << "Please enter school year you created: ";
-	cin >> temp;
+	cin >> schoolYear;
 	cout << endl;
-	while (Year && temp != Year->NumOfYear)
-	{
-		Year = Year->YearNext;
+	while (year != NULL && schoolYear != year->schoolYear) {
+		year = year->yearNext;
 	}
-	if (!Year)
-	{
-		cout << "This year is not valid. Please enter again: " << endl;
+	if (year == NULL) {
+		cout << "Your school year was not created. Please enter again!!!" << endl;
 		return;
 	}
 	cout << "Please enter semester you created: ";
-	cin >> x;
+	cin >> semester;
 	cin.ignore();
-	x = x - 1;
-	cout << "The form of date is dd/mm/yyyy." << endl;
-
-	cout << "Please enter the date start to register course: ";
-	getline(cin, temp);
-	cout << endl;
-
-	Year->Sem[x].StartReg.day = (int)temp[0] * 10 + (int)temp[1] - 528;
-	Year->Sem[x].StartReg.month = (int)temp[3] * 10 + (int)temp[4] - 528;
-	Year->Sem[x].StartReg.year = (int)temp[6] * 1000 + (int)temp[7] * 100 + (int)temp[8] * 10 + (int)temp[9] - 53328;
-
-	cout << "Please enter the date end to register course: ";
-	getline(cin, temp);
-	cout << endl;
-
-	Year->Sem[x].EndReg.day = (int)temp[0] * 10 + (int)temp[1] - 528;
-	Year->Sem[x].EndReg.month = (int)temp[3] * 10 + (int)temp[4] - 528;
-	Year->Sem[x].EndReg.year = (int)temp[6] * 1000 + (int)temp[7] * 100 + (int)temp[8] * 10 + (int)temp[9] - 53328;
-	ifstream in(Year->NumOfYear + "_" + to_string(x + 1) + ".csv");
-
-	if (!in.is_open())
-	{
-		cout << "Input fail.";
+	semester--;
+	string day, month, yearr;
+	cout << "Enter start date of this course registration: " << endl;
+	cout << "Enter start day: ";
+	cin >> day;
+	cout << "Enter start month: ";
+	cin >> month;
+	cout << "Enter start year: ";
+	cin >> yearr;
+	string startDateCou = day + "/" + month + "/" + yearr;
+	cout << "Start date of this course registration is: " << startDateCou << endl;
+	cout << "Enter end date of this course registration: " << endl;
+	cout << "Enter end day: ";
+	cin >> day;
+	cout << "Enter end month: ";
+	cin >> month;
+	cout << "Enter end year: ";
+	cin >> yearr;
+	string endDateCou = day + "/" + month + "/" + yearr;
+	cout << "End date of this course registration is: " << endDateCou << endl;
+	string temp;
+	ifstream fin(schoolYear + "_" + to_string(semester + 1) + ".csv");
+	if (!fin.is_open()) {
+		cout << "Load data failed. Make sure you was create this semester!!!" << endl;
 	}
-	else
-	{
-		Course* Cur = nullptr;
-		while (!in.eof())
-		{
-			if (!Year->Sem[x].pCourse)
-			{
-				Year->Sem[x].pCourse = new Course;
-				Cur = Year->Sem[x].pCourse;
+	else {
+		Course* courseCur = NULL;
+		getline(fin, temp, ',');
+		int numOfSubject = stoi(temp);
+		getline(fin, temp);
+		for (int i = 0;i < numOfSubject; i++) {
+			if (year->semester[semester].course == NULL) {
+				year->semester[semester].course = new Course;
+				courseCur = year->semester[semester].course;
 			}
-			else
-			{
-				Cur->pNext = new Course;
-				Cur = Cur->pNext;
+			else {
+				courseCur->CourseNext = new Course;
+				courseCur = courseCur->CourseNext;
 			}
-			getline(in, Cur->CourseID, ',');
-			getline(in, Cur->NameOfCourse, ',');
-			getline(in, Cur->NameOfTeacher, ',');
-			getline(in, Cur->NumOfCredit, ',');
-			getline(in, Cur->Day1, ',');
-			getline(in, Cur->Session1, ',');
-			getline(in, Cur->Day2, ',');
-			getline(in, Cur->Session2);
-			Cur->NumOfStu = 0;
-			Cur->pNext = nullptr;
+			getline(fin, courseCur->CourseID, ',');
+			getline(fin, courseCur->CourseName, ',');
+			getline(fin, courseCur->StaffName, ',');
+			getline(fin, courseCur->NumOfCredit, ',');
+			getline(fin, courseCur->Day1, ',');
+			getline(fin, courseCur->Session1, ',');
+			getline(fin, courseCur->Day2, ',');
+			getline(fin, courseCur->Session2);
+			courseCur->NumOfStu = 0;
+			courseCur->CourseNext = NULL;
 		}
-		cout << "Input successfully." << endl << endl;
+		cout << "Load data of course successfully." << endl << endl;
 	}
 }
 
-void AddCou(Course*& Cou)
-{
-	Course* temp = new Course;
-	temp->NumOfStu = 0;
-	cout << "Please enter course ID: ";
-	cin >> temp->CourseID;
+void addCourse(Course*& course) {
+	Course* tempCourse = new Course;
+	cout << "Enter information of the course you want to add: " << endl;
+	tempCourse->NumOfStu = 0;
+	cout << "Enter course ID: ";
+	cin >> tempCourse->CourseID;
 	cin.ignore();
-
-	cout << "Please enter Name of course: ";
-	getline(cin, temp->NameOfCourse);
-
-	cout << "Please enter teacher Name: ";
-	getline(cin, temp->NameOfTeacher);
-
-	cout << "Please enter number of credits: ";
-	getline(cin, temp->NumOfCredit);
-
-	cout << "Please enter day 1: ";
-	getline(cin, temp->Day1);
-
-	cout << "Please enter session 1: ";
-	getline(cin, temp->Session1);
-
-	cout << "Please enter day 2: ";
-	getline(cin, temp->Day2);
-
-	cout << "Please enter session 2: ";
-	getline(cin, temp->Session2);
-
-	temp->pNext = Cou;
-	Cou = temp;
-	cout << "Add new course successfully" << endl;
+	cout << "Enter name of course: ";
+	getline(cin, tempCourse->CourseName);
+	cout << "Enter name of teacher: ";
+	getline(cin, tempCourse->StaffName);
+	cout << "Enter number of credits: ";
+	getline(cin, tempCourse->NumOfCredit);
+	cout << "Enter day 1: ";
+	getline(cin, tempCourse->Day1);
+	cout << "Enter session 1: ";
+	getline(cin, tempCourse->Session1);
+	cout << "Enter day 2: ";
+	getline(cin, tempCourse->Day2);
+	cout << "Enter session 2: ";
+	getline(cin, tempCourse->Session2);
+	tempCourse->CourseNext = course;
+	course = tempCourse;
+	cout << "Add new course successfully!!!" << endl;
 }
 
-void ViewCou(Course* Cou, int& t, int& i)
-{
-	clear();
-	int k = 1;
+void viewCourse(Course* course, int& noCourse) {
+	int no = 1;
 	int y = 16, a = 20;
-	Course* Cur = Cou;
+	Course* courseCur = course;
 	cout << endl;
 	gotoxy(8, 15);
 	cout << "Course ID";
@@ -345,605 +366,137 @@ void ViewCou(Course* Cou, int& t, int& i)
 	cout << "Credits";
 	gotoxy(a, 15);
 	a = a + 22;
-	cout << "Number of Students";
+	cout << "Number of students";
 	gotoxy(a, 15);
-	cout << "Session";
-	while (Cur)
-	{
+	cout << "Day of week and session";
+	while (courseCur != NULL) {
 		int x = 20;
 		gotoxy(6, y);
-		cout << k;
+		cout << no;
 		gotoxy(8, y);
-		cout << Cur->CourseID;
+		cout << courseCur->CourseID;
 		gotoxy(x, y);
 		x = x + 30;
-		cout << Cur->NameOfCourse;
+		cout << courseCur->CourseName;
 		gotoxy(x, y);
 		x = x + 13;
-		cout << Cur->NameOfTeacher;
+		cout << courseCur->StaffName;
 		gotoxy(x, y);
 		x = x + 14;
-		cout << Cur->NumOfCredit;
+		cout << courseCur->NumOfCredit;
 		gotoxy(x, y);
 		x = x + 15;
-		cout << Cur->NumOfStu << "/" << 50;
+		cout << courseCur->NumOfStu << "/" << 50;
 		gotoxy(x, y);
-		cout << "Thu " << Cur->Day1 << " Ca " << Cur->Session1 << " Thu " << Cur->Day2 << " Ca " << Cur->Session2;
+		cout << "On " << courseCur->Day1 << " in " << courseCur->Session1 << " and " << courseCur->Day2 << " in " << courseCur->Session2;
 		y = y + 1;
-		Cur = Cur->pNext;
-		k++;
+		courseCur = courseCur->CourseNext;
+		no++;
 		cout << endl;
 	}
-	t = y;
-	i = k;
+	noCourse = no;
 }
 
-void UpdateCou(Schoolyear* Year, int Se)
-{
-	Course* Cur = Year->Sem[Se].pCourse;
-	int count = 1, t, option;
-	ViewCou(Year->Sem[Se].pCourse, t, count);
-	t++;
-	cout << "Please enter the course you want to update:";
+void updateCourse(Schoolyear* year, int semester) {
+	Course* courseCur = year->semester[semester].course;
+	int numOfSubject = 1, option;
+	viewCourse(year->semester[semester].course, numOfSubject);
+	numOfSubject--;
+	cout << "Enter the no of course you want to update: ";
 	cin >> option;
-	cin.ignore();
-	Cur = Year->Sem[Se].pCourse;
-	for (int i = 1; i < option; i++)
-	{
-		Cur = Cur->pNext;
-	}
-	cout << "You are choosing:" << Cur->NameOfCourse;
-	cout << "1. Name of Teacher. ";
-	cout << "2. Number of Credits. ";
-	cout << "3. Present students enrolled. ";
-	cout << "4. Day 1. ";
-	cout << "5. Session 1. ";
-	cout << "6. Day 2. ";
-	cout << "7. Session 2. ";
-	cout << "Enter your option: ";
-	cin >> option;
-	cin.ignore();
-	switch (option)
-	{
-	case 1:
-		cout << "Please Change the Name of teacher: ";
-		getline(cin, Cur->NameOfTeacher);
-		break;
-	case 2:
-		cout << "Please Change the number of credits: ";
-		getline(cin, Cur->NumOfCredit);
-		break;
-	case 3:
-		cout << "Please Change the student enrolled: ";
-		cin >> Cur->NumOfStu;
-		break;
-	case 4:
-		cout << "Please Change the day 1: ";
-		getline(cin, Cur->Day1);
-		break;
-	case 5:
-		cout << "Please Change the session 1: ";
-		getline(cin, Cur->Session1);
-		break;
-	case 6:
-		cout << "Please Change the day 2: ";
-		getline(cin, Cur->Day2);
-		break;
-	case 7:
-		cout << "Please Change the session 2: ";
-		getline(cin, Cur->Session2);
-		break;
-	default:
-		break;
-	}
-	cout << "Update course successfully";
-}
-
-void SaveInfoCou(Schoolyear* Year, int sem)
-{
-	Course* Cur = Year->Sem[sem].pCourse;
-	ofstream course;
-	course.open(Year->NumOfYear + "_" + (char)(sem + 49) + ".csv", ios::trunc);
-	while (Cur != nullptr)
-	{
-		course << Cur->NameOfTeacher << "," << Cur->NumOfCredit << "," << Cur->NumOfStu << "," << Cur->Day1 << "," << Cur->Session1 << "," << Cur->Day2 << "," << Cur->Session2 << "\n";
-		Cur = Cur->pNext;
-	}
-	course.close();
-}
-
-void DeleteCou(Schoolyear*& Year, int Se)
-{
-	Course* Cur = Year->Sem[Se].pCourse;
-	int count = 1, t, option;
-	ViewCou(Year->Sem[Se].pCourse, t, count);
-	t++;
-	cout << "Please enter the course you want to update:";
-	cin >> option;
-	cin.ignore();
-	Cur = Year->Sem[Se].pCourse;
-	if (option <= count)
-	{
-		if (option == 1)
-		{
-			Year->Sem[Se].pCourse = Year->Sem[Se].pCourse->pNext;
-			delete Cur;
-		}
-		else
-		{
-			for (int i = 2; i < option; i++)
-			{
-				Cur = Cur->pNext;
-			}
-
-			Course* temp = Cur->pNext;
-			Cur->pNext = Cur->pNext->pNext;
-			delete temp;
-			cout << "Delete course successfully.";
-			//SaveInfoCourse(Year, sem); //Goi lai ham Save de luu thong tin vao file csv
+	while (option > numOfSubject || option < 0) {
+		cout << "Invalid input. Enter again: ";
+		cin >> option;
+		if (option == 0) {
+			return;
 		}
 	}
-	else
-	{
-		cout << "This course is not delted";
+	if (option == 0) {
+		return;
 	}
+	cin.ignore();
+	courseCur = year->semester[semester].course;
+	for (int i = 1; i < option; i++) {
+		courseCur = courseCur->CourseNext;
+	}
+	cout << "The name of course you want to update is:" << courseCur->CourseName << endl;
+	cout << "1. Name of teacher." << endl;
+	cout << "2. Number of credits." << endl;
+	cout << "3. Number of student enrolled the course." << endl;
+	cout << "4. Day 1." << endl;
+	cout << "5. Session 1." << endl;
+	cout << "6. Day 2." << endl;
+	cout << "7. Session 2." << endl;
+	cout << "Enter your option you want to update: ";
+	cin >> option;
+	cin.ignore();
+	if (option == 1) {
+		cout << "Enter the new name of teacher: ";
+		cin >> courseCur->StaffName;
+	}
+	else if (option == 2) {
+		cout << "Enter the new number of credits: ";
+		cin >> courseCur->NumOfCredit;
+	}
+	else if (option == 3) {
+		cout << "Enter the new number of students enrolled the course: ";
+		cin >> courseCur->NumOfStu;
+	}
+	else if (option == 4) {
+		cout << "Enter the new day 1: ";
+		cin >> courseCur->Day1;
+	}
+	else if (option == 5) {
+		cout << "Enter the new session of day 1: ";
+		cin >> courseCur->Session1;
+	}
+	else if (option == 6) {
+		cout << "Enter the new day 2: ";
+		cin >> courseCur->Day2;
+	}
+	else if (option == 7) {
+		cout << "Enter the new session of day 2: ";
+		cin >> courseCur->Session2;
+	}
+	cout << "Update course successfully!!!" << endl;
 }
 
-void Now(Date& Today)
-{
-	time_t now = time(0);
-	tm* ltm = localtime(&now);
-	Today.year = 1900 + ltm->tm_year;
-	Today.month = 1 + ltm->tm_mon;
-	Today.day = ltm->tm_mday;
-}
-
-bool CheckDateRegister(Date Today, Date StartReg, Date EndReg)
-{
-	if (Today.year >= StartReg.year && Today.year <= EndReg.year) {
-		if (Today.month >= StartReg.month && Today.month <= EndReg.month) {
-			if (Today.day >= StartReg.day && Today.day <= EndReg.day) {
-				return true;
-			}
-			else {
-				return false;
-			}
+void deleteCourse(Schoolyear*& year, int semester) {
+	Course* courseCur = year->semester[semester].course;
+	int numOfSubject = 1, option;
+	viewCourse(year->semester[semester].course, numOfSubject);
+	numOfSubject--;
+	cout << "Enter the course you want to delete: ";
+	cin >> option;
+	while (option > numOfSubject || option < 0) {
+		cout << "Invalid input. Enter again: ";
+		cin >> option;
+		if (option == 0) {
+			return;
+		}
+	}
+	if (option == 0) {
+		return;
+	}
+	cin.ignore();
+	courseCur = year->semester[semester].course;
+	if (option <= numOfSubject) {
+		if (option == 1) {
+			year->semester[semester].course = year->semester[semester].course->CourseNext;
+			delete courseCur;
 		}
 		else {
-			return false;
+			for (int i = 2; i < option; i++) {
+				courseCur = courseCur->CourseNext;
+			}
+			Course* tempCourse = courseCur->CourseNext;
+			courseCur->CourseNext = courseCur->CourseNext->CourseNext;
+			delete tempCourse;
+			cout << "Delete course successfully!!!" << endl;
 		}
 	}
 	else {
-		return false;
+		cout << "Invalid input. Please enter again!!!" << endl;
 	}
 }
 
-bool CheckDateEndSemester(Date Today, Date EndSem)
-{
-	if (Today.year > EndSem.year)
-		return true;
-	else if (Today.year == EndSem.year)
-	{
-		if (Today.month > EndSem.month)
-			return true;
-		else if (Today.month == EndSem.month)
-			if (Today.day > EndSem.day)
-				return true;
-	}
-	return false;
-}
-
-bool CheckImport(Schoolyear* Year, int x)
-{
-	if (!Year->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered) return false;
-	if (Year->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered->Score.Final == "") return false;
-	return true;
-}
-
-void CourseEnroll(Schoolyear* Year, Course* CourseHead, int x, int& NumOfOpt)
-{
-	int opt;
-	int j = (x / 100) - 1;
-	int k = (x % 100) - 1;
-	Course* ListEnroll = Year->CLass[j].Stu[k].Registered;
-	while (ListEnroll != nullptr && ListEnroll->pNext != nullptr)
-	{
-		ListEnroll = ListEnroll->pNext;
-	}
-	while (NumOfOpt != 5)
-	{
-	Enroll:
-		Data* InfoCur = nullptr;
-		int i = 1;
-		Course* CourseCur = CourseHead;
-		int t = 0;
-		ViewCou(CourseCur, t, i);
-		t++;
-		i--;
-		cout << "Register(0.stop): ";
-		cin >> opt;
-		while (opt > i || opt < 0)
-		{
-			cout << "Error. Register again: ";
-			cout << "     ";
-			cin >> opt;
-			if (opt == 0)return;
-		}
-
-		if (opt == 0) return;
-
-
-		int count = 1;
-		while (CourseCur != nullptr && count != opt)
-		{
-
-			CourseCur = CourseCur->pNext;
-			count++;
-
-		}
-
-		if (CourseCur != nullptr)
-		{
-			Course* EnrollMove = Year->CLass[j].Stu[k].Registered;
-			while (EnrollMove != nullptr)
-			{
-				if (EnrollMove->Day1 == CourseCur->Day1)
-				{
-					if (EnrollMove->Session1 == CourseCur->Session1)
-					{
-						cout << "Conflicted with another course. Register again: " << endl;
-						goto Enroll;
-					}
-				}
-				if (EnrollMove->Day2 == CourseCur->Day2)
-				{
-					if (EnrollMove->Session2 == CourseCur->Session2)
-					{
-						cout << "Conflicted with another course. Register again:" << endl;
-						goto Enroll;
-					}
-				}
-
-				EnrollMove = EnrollMove->pNext;
-
-			}
-			Data* InfoMove = CourseCur->DataOfStu;
-			while (InfoMove != nullptr && InfoMove->StudentID != Year->CLass[j].Stu[k].StudentID)
-			{
-				InfoMove = InfoMove->pNext;
-			}
-
-			if (InfoMove == nullptr && EnrollMove == nullptr)
-			{
-				if (CourseCur->NumOfStu < CourseCur->MaxStu)
-				{
-
-					Data* temp = new Data;
-					temp->j = j;
-					temp->k = k;
-					temp->StudentID = Year->CLass[j].Stu[k].StudentID;
-					temp->FirstName = Year->CLass[j].Stu[k].FirstName;
-					temp->Name = Year->CLass[j].Stu[k].Name;
-					temp->Sex = Year->CLass[j].Stu[k].Sex;
-					temp->DOB = Year->CLass[j].Stu[k].DOB;
-					temp->ID = Year->CLass[j].Stu[k].ID;
-					temp->pNext = nullptr;
-
-
-					if (CourseCur->DataOfStu == nullptr || CourseCur->DataOfStu->StudentID > temp->StudentID)
-					{
-						temp->pNext = CourseCur->DataOfStu;
-						CourseCur->DataOfStu = temp;
-					}
-					else
-					{
-						InfoCur = CourseCur->DataOfStu;
-
-						while (InfoCur->pNext != nullptr && InfoCur->pNext->StudentID < temp->StudentID)
-						{
-							InfoCur = InfoCur->pNext;
-						}
-
-
-						temp->pNext = InfoCur->pNext;
-						InfoCur->pNext = temp;
-					}
-
-
-					if (ListEnroll != nullptr)
-					{
-						ListEnroll->pNext = new Course;
-						ListEnroll = ListEnroll->pNext;
-					}
-
-					else
-					{
-
-						Year->CLass[j].Stu[k].Registered = new Course;
-						ListEnroll = Year->CLass[j].Stu[k].Registered;
-					}
-
-					ListEnroll->CourseID = CourseCur->CourseID;
-					ListEnroll->NameOfCourse = CourseCur->NameOfCourse;
-					ListEnroll->NameOfTeacher = CourseCur->NameOfTeacher;
-					ListEnroll->NumOfCredit = CourseCur->NumOfCredit;
-					ListEnroll->Day1 = CourseCur->Day1;
-					ListEnroll->Session1 = CourseCur->Session1;
-					ListEnroll->Day2 = CourseCur->Day2;
-					ListEnroll->Session2 = CourseCur->Session2;
-
-					NumOfOpt++;
-					CourseCur->NumOfStu++;
-					ListEnroll->NumOfStu = CourseCur->NumOfStu;
-
-					ListEnroll->pNext = nullptr;
-
-				}
-
-				else
-				{
-					cout << "Course is full. Register again: " << endl;
-					goto Enroll;
-				}
-
-			}
-			else
-			{
-				cout << "You have registered this course. Register again: " << endl;
-				goto Enroll;
-			}
-
-		}
-
-	}
-}
-
-void ViewListEnrolled(Schoolyear* Year, int x)
-{
-	int i = 1;
-	int j = (x / 100) - 1;
-	int k = (x % 100) - 1;
-	Course* CourseCur = Year->CLass[j].Stu[k].Registered;
-	while (CourseCur != nullptr)
-	{
-		cout << i << "." << CourseCur->CourseID << endl;
-		cout << CourseCur->NameOfCourse << endl;
-		cout << CourseCur->NameOfTeacher << endl;
-		cout << CourseCur->NumOfCredit << endl;
-		cout << CourseCur->Day1 << '/' << CourseCur->Session1 << endl;
-		cout << CourseCur->Day2 << '/' << CourseCur->Session2 << endl;
-		cout << CourseCur->NumOfStu << '/' << CourseCur->MaxStu << endl;
-		CourseCur = CourseCur->pNext;
-		i++;
-	}
-}
-
-void RemoveCourseEnrolled(Schoolyear* Year, Course* CourseHead, int x)
-{
-	int j = (x / 100) - 1;
-	int k = (x % 100) - 1;
-	Data* InfoCur = nullptr;
-	Course* ListEnroll = Year->CLass[j].Stu[k].Registered;
-	Course* CourseCur = CourseHead;
-	if (ListEnroll == nullptr) return;
-	int optRemv, t = 0, i = 1;
-	ViewCou(ListEnroll, t, i);
-	t++; i--;
-	cout << "Input num of the course to remove:";
-	cin >> optRemv;
-	Course* temp = nullptr;
-	if (optRemv == 1)
-	{
-		Year->CLass[j].Stu[k].Registered = Year->CLass[j].Stu[k].Registered->pNext;
-		temp = ListEnroll;
-	}
-	else
-	{
-		int count = 1;
-		while (ListEnroll->pNext != nullptr && count != optRemv - 1)
-		{
-			ListEnroll = ListEnroll->pNext;
-			count++;
-		}
-
-		if (ListEnroll->pNext != nullptr)
-		{
-			temp = ListEnroll->pNext;
-			ListEnroll->pNext = temp->pNext;
-		}
-	}
-
-
-	while (CourseCur != nullptr && CourseCur->CourseID != temp->CourseID)
-	{
-		CourseCur = CourseCur->pNext;
-	}
-
-	delete temp;
-
-	if (CourseCur != nullptr)
-	{
-		InfoCur = CourseCur->DataOfStu;
-
-		if (InfoCur->StudentID == Year->CLass[j].Stu[k].StudentID)
-		{
-
-			CourseCur->DataOfStu = CourseCur->DataOfStu->pNext;
-			delete InfoCur;
-		}
-		else
-		{
-			while (InfoCur->pNext != nullptr && InfoCur->pNext->StudentID != Year->CLass[j].Stu[k].StudentID)
-			{
-				InfoCur = InfoCur->pNext;
-			}
-
-			if (InfoCur->pNext != nullptr)
-			{
-				Data* temp = InfoCur->pNext;
-				InfoCur->pNext = temp->pNext;
-				delete temp;
-			}
-		}
-		CourseCur->NumOfStu--;
-		Year->CLass[j].Stu[k].NumOfOpt--;
-	}
-	cout << "Remove course succesfully." << endl;
-}
-
-void ViewListClasses(Schoolyear* Year)
-{
-	string year = "";
-	cout << "Enter the year you want to view class: ";
-	cin >> year;
-	cout << endl;
-	while (Year != nullptr)
-	{
-		if (year == Year->NumOfYear)
-		{
-			for (int i = 0; i < Year->NumOfClass; i++)
-			{
-				cout << i + 1 << "." << Year->CLass[i].NameOfClass;
-				cout << endl << endl;
-			}
-
-			break;
-		}
-		Year = Year->YearNext;
-	}
-	if (Year == nullptr)
-	{
-		cout << "The entered year is not available" << endl;
-	}
-
-}
-
-void ViewListStudentInClass(Schoolyear* Year)
-{
-	string NameClass = "";
-	cout << "Enter the Name class you want to view: ";
-	cin >> NameClass;
-	while (Year != nullptr)
-	{
-		for (int i = 0; i < Year->NumOfClass; i++)
-		{
-			if (NameClass == Year->CLass[i].NameOfClass)
-			{
-				clear();
-				int k = 1;
-				int y = 16, a = 13;
-				cout << endl;
-				gotoxy(8, 15);
-				cout << "No";
-				gotoxy(a, 15);
-				a = a + 15;
-				cout << "Student ID";
-				gotoxy(a, 15);
-				a = a + 30;
-				cout << "Full Name";
-				gotoxy(a, 15);
-				a = a + 10;
-				cout << "Gender";
-				gotoxy(a, 15);
-				a = a + 22;
-				cout << "Date of Birth";
-				gotoxy(a, 15);
-				cout << "Social ID";
-				for (int j = 0; j < Year->CLass[i].NumOfStudent; j++)
-				{
-					int x = 13;
-					gotoxy(8, y);
-					cout << k;
-					gotoxy(x, y);
-					x = x + 15;
-					cout << Year->CLass[i].Stu[j].StudentID;
-					gotoxy(x, y);
-					x = x + 30;
-					cout << Year->CLass[i].Stu[j].FirstName << " " << Year->CLass[i].Stu[j].Name;
-					gotoxy(x, y);
-					x = x + 10;
-					cout << Year->CLass[i].Stu[j].Sex;
-					gotoxy(x, y);
-					x = x + 22;
-					cout << Year->CLass[i].Stu[j].DOB;
-					gotoxy(x, y);
-					cout << Year->CLass[i].Stu[j].ID;
-					y = y + 1;
-				}
-				cout << endl << endl;
-				return;
-			}
-		}
-		Year = Year->YearNext;
-	}
-	if (Year == nullptr)
-	{
-		cout << "The entered Name of is not available" << endl;
-	}
-}
-
-void ViewListStudentInCourse(Schoolyear* Year, int sem)
-{
-	string CourseID = "";
-	cout << "Enter the course ID you want to view:";
-	cin >> CourseID;
-	Course* CourseCur = Year->Sem[sem].pCourse;
-	while (CourseCur != nullptr)
-	{
-		if (CourseID == CourseCur->CourseID)
-		{
-			Data* Cur;
-			Cur = CourseCur->DataOfStu;
-			clear();
-			int k = 1;
-			int y = 16, a = 13;
-			cout << endl;
-			gotoxy(8, 15);
-			cout << "No";
-			gotoxy(a, 15);
-			a = a + 15;
-			cout << "Student ID";
-			gotoxy(a, 15);
-			a = a + 30;
-			cout << "Full Name";
-			gotoxy(a, 15);
-			a = a + 10;
-			cout << "Gender";
-			gotoxy(a, 15);
-			a = a + 22;
-			cout << "Date of Birth";
-			gotoxy(a, 15);
-			cout << "Social ID";
-			while (k <= CourseCur->NumOfStu)
-			{
-				int x = 13;
-				gotoxy(8, y);
-				cout << k;
-				gotoxy(x, y);
-				x = x + 15;
-				cout << Cur->StudentID;
-				gotoxy(x, y);
-				x = x + 30;
-				cout << Cur->FirstName << " " << Cur->Name;
-				gotoxy(x, y);
-				x = x + 10;
-				cout << Cur->Sex;
-				gotoxy(x, y);
-				x = x + 22;
-				cout << Cur->DOB;
-				gotoxy(x, y);
-				cout << Cur->ID;
-				y = y + 1;
-				Cur = Cur->pNext;
-				k++;
-			}
-			cout << endl << endl;
-			return;
-		}
-		CourseCur = CourseCur->pNext;
-	}
-	if (CourseCur == nullptr)
-	{
-		cout << "The entered course is not available" << endl;
-	}
-}

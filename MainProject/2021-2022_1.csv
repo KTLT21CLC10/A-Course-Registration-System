@@ -1,5 +1,6 @@
-﻿BAA00005,Kinh te dai cuong,PXKien,2,4,S4,4,S2
-CSC00004,Nhap mon Cong nghe thong tin,DTTHa,4,4,S1,5,S1
-CSC10001,Nhap mon lap trinh,DNHDuong,4,5,S4,3,S4
-CSC10101,Ky nang mem,TLVinh,3,2,S2,2,S4
-MTH00009,Toan roi rac,TTNNga,4,6,S2,6,S4
+5,,,,,,,
+BAA00005,Kinh te dai cuong,HTLNa,2,FRI,S1,FRI,S2
+CSC00004,Nhap mon cong nghe thong tin,TGHong,4,MON,S3,FRI,S3
+CSC10001,Nhap mon lap trinh,NLHDung,4,TUE,S3,THU,S1
+CSC10121,Ky nang mem,VHQuan,3,THU,S3,THU,S4
+MTH00009,Toan roi rac,NKNgoc,4,WED,S1,SAT,S1

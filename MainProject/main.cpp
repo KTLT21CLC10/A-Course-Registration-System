@@ -1,212 +1,182 @@
-﻿#include "staff.h"
+#include "Header.h"
 #include <string>
+using namespace std;
 
-int main()
-{
-	Schoolyear* YearHead = NULL, * YearCur1 = NULL, * YearCur2 = NULL;
-	Teacher* Staff;
+int main() {
+	Schoolyear* yearHead = NULL, * yearNode1 = NULL, * yearNode2 = NULL;
+	Staff* staff;
 	string username, password;
-	Date Today;
-	Now(Today);
-	int option1, NumOfStaff, sem = 0;
-	InputStaff(Staff, NumOfStaff);
-	do
-	{
-		Now(Today);
-		InputAccount(username, password);
-		int x = CheckLogin(username, password, YearCur1, Staff, NumOfStaff);
-		if (x == 0)
-		{
+	int option, numOfStaff, semester = 0;
+	loadInfoStaff(staff, numOfStaff);
+	do {
+		system("cls");
+		inputAccount(username, password);
+		int user = loginSystem(username, password, yearNode1, staff, numOfStaff);
+		if (user == 0) {
 			cout << "Your username or password is incorrect!!!" << endl;
 			password = "";
-			YearCur1 = YearHead;
+			yearNode1 = yearHead;
 			continue;
 		}
-		else
-		{
-			cout << "You log in successfully!!!" << endl << endl;
-		}
-		string* str1;
-		int k;
-		if (x < 100)k = 10;
-		else
-		{
-			k = 9;
-			/*if (CheckDateRegister(Today, YearCur2->Sem[sem].StartReg, YearCur2->Sem[sem].EndReg)) k = 6;
-			else k = 4;
-			if (CheckImport(YearCur1, x)) k = 5;*/
-		}
-		str1 = new string[k];
-		str1[0] = "Log out";
-		str1[1] = "View info";
-		str1[2] = "Change password";
-		if (x < 100)
-		{
-			str1[3] = "Add new year and load information of student";
-			str1[4] = "Create semester";
-			str1[5] = "Create course and load information of course";
-			str1[6] = "Add a course";
-			str1[7] = "View list of courses";
-			str1[8] = "Update course";
-			str1[9] = "Delete course";
-		}
-		else
-		{
-			str1[3] = "Course Registration";
-			str1[4] = "View list of your courses";
-			str1[5] = "View list of class";
-			str1[6] = "View list of students in class";
-			str1[7] = "View list of course";
-			str1[8] = "View list of students in a course";
-		}
-		int option1 = 1;
-		while (option1 != 0)
-		{
-			for (int i = 1; i < k; i++) {
-				cout << i << ". " << str1[i] << endl;
+		while (true) {
+			if (user == -1) {
+				cout << "1. View your profile information." << endl;
+				cout << "2. Change your password" << endl;
+				cout << "3. Add new year" << endl;
+				cout << "4. Add several classes" << endl;
+				cout << "5. Load data of students" << endl;
+				cout << "6. Create semester" << endl;
+				cout << "7. Create course registration and load information of course" << endl;
+				cout << "0. Log out of the system" << endl;
 			}
-			cout << "0. " << str1[0] << endl;
-			cout << "Input your option: ";
-			cin >> option1;
-			switch (option1)
-			{
-				case 1:
-				{
-					system("cls");
-					ViewIn(x, YearCur1, Staff);
-					break;
+			else {
+				cout << "1. View your profile information." << endl;
+				cout << "2. Change your password" << endl;
+				cout << "3. Course Registration" << endl;
+				cout << "4. View list of your courses" << endl;
+				cout << "5. View list of class" << endl;
+				cout << "6. View list of students in class" << endl;
+				cout << "7. View list of courses" << endl;
+				cout << "8. View list of students in a course" << endl;
+				cout << "0. Log out of the system" << endl;
+			}
+			cout << "Enter your option: ";
+			cin >> option;
+			if (option == 1) {
+				system("cls");
+				viewInfo(user, yearNode1, staff);
+			}
+			else if (option == 2) {
+				system("cls");
+				changePass(user, yearNode1, staff, numOfStaff);
+			}
+			else if (option == 3) {
+				system("cls");
+				if (user < 0) {
+					string schoolYear;
+					createNewYear(schoolYear);
 				}
-				case 2:
-				{
-					system("cls");
-					ChangePass(YearCur1, Staff, x, NumOfStaff);  
-					break;
-				}
-				case 3:
-				{
-					system("cls");
-					if (x < 100)
-					{
-						if (YearHead == nullptr)
-						{
-							AddYear(YearHead);
-							YearCur1 = YearHead;
+				else {
+					int optionEnroll;
+					while (true) {
+						cout << "1. Enroll in a course" << endl;
+						cout << "2. View list of enrolled course" << endl;
+						cout << "3. Remove a course from enrolled list" << endl;
+						cout << "0. Back" << endl;
+						cout << "Enter your choice: ";
+						cin >> optionEnroll;
+						if (optionEnroll == 1) {
+							system("cls");
+							enrollCourse(yearNode1, yearNode2->semester[semester].course, user, yearNode1->Class[user - 1].student[user - 1].numOfSubject);
 						}
-						else
-						{
-							AddYear(YearCur1->YearNext);
-							YearCur1 = YearCur1->YearNext;
+						else if (optionEnroll == 2) {
+							system("cls");
+							int numOfSubject;
+							viewCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, numOfSubject);
 						}
-					}
-					else
-					{
-						int choice;
-						while (true) {
-							cout << "1. Enroll in a course" << endl;
-							cout << "2. View list of enrolled course" << endl;
-							cout << "3. Remove a course from enrolled list" << endl;
-							cout << "0. Back" << endl;
-							cout << "Enter your choice: ";
-							cin >> choice;
-							if (choice == 1) {
-								CourseEnroll(YearCur1, YearCur2->Sem[sem].pCourse, x, YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].NumOfOpt);
-							}
-							else if (choice == 2) {
-								int t, i;
-								ViewCou(YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered, t, i);
-							}
-							else if (choice == 3) {
-								RemoveCourseEnrolled(YearCur1, YearCur2->Sem[sem].pCourse, x);
-							}
-							else {
-								break;
-							}
+						else if (optionEnroll == 3) {
+							system("cls");
+							removeCourseEnrolled(yearNode1, yearNode2->semester[semester].course, user);
+						}
+						else {
+							break;
 						}
 					}
-					break;
-				}
-				case 4:
-				{
-					system("cls");
-					if (x < 100)
-					{
-						YearCur2 = YearHead;
-						AddSem(YearCur2, sem);
-					}
-					else
-					{
-						int t, i;
-						ViewCou(YearCur1->CLass[x / 100 - 1].Stu[x % 100 - 1].Registered, t, i);
-					}
-					break;
-				}
-				case 5:
-				{
-					system("cls");
-					if (x < 100)
-					{
-						if (CheckDateEndSemester(Today, YearCur2->Sem[sem].EndSem))
-							CreateCourse(YearCur2, sem);
-						else
-							cout << "Your date end semester is invalid!!!" << endl;
-					}
-					else
-					{
-						ViewListClasses(YearHead);
-					}
-					break;
-				}
-				case 6:
-				{
-					system("cls");
-					if (x < 100) {
-						AddCou(YearCur2->Sem[sem].pCourse);
-					}
-					else {
-						ViewListStudentInClass(YearHead);
-					}
-					break;
-				}
-				case 7:
-				{
-					system("cls");
-					if (x < 100) {
-						int t;
-						ViewCou(YearCur2->Sem[sem].pCourse, t, t);
-					}
-					else {
-						int t;
-						ViewCou(YearCur2->Sem[sem].pCourse, t, t);
-					}
-					break;
-				}
-				case 8:
-				{
-					system("cls");
-					if (x < 100) {
-						UpdateCou(YearCur2, sem);
-					}
-					else {
-						ViewListStudentInCourse(YearCur2, sem);
-					}
-					break;
-				}
-				case 9:
-				{
-					system("cls");
-					DeleteCou(YearCur2, sem);
-					break;
-				}
-				case 0:
-				{
-					YearCur1 = YearHead;
-					break;
 				}
 			}
-			password = "";
+			else if (option == 4) {
+				system("cls");
+				if (user < 0) {
+					Class* Class;
+					int numOfClass;
+					system("cls");
+					createNewClass(Class, numOfClass);
+				}
+				else {
+					int numOfSubject;
+					viewCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, numOfSubject);
+				}
+			}
+			else if (option == 5) {
+				system("cls");
+				if (user < 0) {
+					if (yearHead == NULL)
+					{
+						loadInfoStudent(yearHead);
+						yearNode1 = yearHead;
+					}
+					else
+					{
+						loadInfoStudent(yearNode1->yearNext);
+						yearNode1 = yearNode1->yearNext;
+					}
+				}
+				else {
+					viewListClasses(yearHead);
+				}
+			}
+			else if (option == 6) {
+				system("cls");
+				if (user < 0)
+				{
+					yearNode2 = yearHead;
+					createSemester(yearNode2, semester);
+				}
+				else {
+					viewListStudentInClass(yearHead);
+				}
+			}
+			else if (option == 7) {
+				system("cls");
+				if (user < 0) {
+					createCourseRegistration(yearNode2, semester);
+					int optionSub;
+					while (true) {
+						cout << "1. Add a course" << endl;
+						cout << "2. View list of courses" << endl;
+						cout << "3. Update course" << endl;
+						cout << "4. Delete course" << endl;
+						cout << "0. Back" << endl;
+						cout << "Enter your choice: ";
+						cin >> optionSub;
+						if (optionSub == 1) {
+							system("cls");
+							addCourse(yearNode2->semester[semester].course);
+						}
+						else if (optionSub == 2) {
+							system("cls");
+							int numOfSub;
+							viewCourse(yearNode2->semester[semester].course, numOfSub);
+						}
+						else if (optionSub == 3) {
+							system("cls");
+							updateCourse(yearNode2, semester);
+						}
+						else if (optionSub == 4) {
+							system("cls");
+							deleteCourse(yearNode2, semester);
+						}
+						else {
+							break;
+						}
+					}
+				}
+				else {
+					int numOfSubject;
+					viewCourse(yearNode2->semester[semester].course, numOfSubject);
+				}
+			}
+			else if (option == 8) {
+				system("cls");
+				viewListStudentInCourse(yearNode2, semester);
+			}
+			else {
+				yearNode1 = yearHead;
+				break;
+			}
 		}
-		delete[]str1;
+		password = "";
 	} while (true);
-	delete[]Staff;
+	delete[]staff;
 	return 0;
 }
