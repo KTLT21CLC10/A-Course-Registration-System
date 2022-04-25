@@ -179,6 +179,7 @@ int main() {
 							deleteCourse(yearNode2, semester);
 						}
 						else {
+							saveInfoCourseStaff(yearNode2->semester[semester].course, yearNode2, semester);
 							break;
 						}
 					}

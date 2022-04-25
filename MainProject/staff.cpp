@@ -693,3 +693,14 @@ void deleteCourse(Schoolyear*& year, int semester) {
 	}
 }
 
+void saveInfoCourseStaff(Course*& course, Schoolyear*& year, int& semester) {
+	string temp;
+	ofstream fout("Data of " + year->schoolYear + "_" + to_string(semester + 1) + ".csv");
+	while (course != NULL) {
+		fout << course->CourseID << "," << course->CourseName << ","
+			<< course->StaffName << "," << course->NumOfCredit << ","
+			<< course->NumOfStu << "," << course->Day1 << ","
+			<< course->Session1 << "," << course->Day2 << "," << course->Session2 << endl;
+		course = course->CourseNext;
+	}
+}

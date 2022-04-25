@@ -104,6 +104,8 @@ void updateCourse(Schoolyear*, int);
 
 void deleteCourse(Schoolyear*&, int);
 
+void saveInfoCourseStaff(Course*&, Schoolyear*&, int&);
+
 void loadInfoCourse(Schoolyear*&, int&);
 
 void saveInfoCourse(Course*&, string);
