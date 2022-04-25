@@ -281,8 +281,8 @@ void loadInfoStudent(Schoolyear*& year) {
 bool checkDateSemester(Schoolyear*& year, int& semester) {
 	int schoolYearStart = (int)(year->schoolYear[0]) * 1000 + (int)(year->schoolYear[1]) * 100 + (int)(year->schoolYear[2]) * 10 + (int)(year->schoolYear[3]) - 53328;
 	int schoolYearEnd = (int)(year->schoolYear[5]) * 1000 + (int)(year->schoolYear[6]) * 100 + (int)(year->schoolYear[7]) * 10 + (int)(year->schoolYear[8]) - 53328;
-	if ((stoi(year->semester[semester].startDate.year) >= schoolYearStart && stoi(year->semester[semester].startDate.year) <= schoolYearEnd) && (stoi(year->semester[semester].endDate.year) >= schoolYearStart && stoi(year->semester[semester].endDate.year) <= schoolYearEnd)) {
-		if (semester == 0) {
+	if (semester == 0) {
+		if (stoi(year->semester[semester].startDate.year) == schoolYearStart && stoi(year->semester[semester].startDate.year) == schoolYearStart) {
 			if ((stoi(year->semester[semester].startDate.month) >= 9) && (stoi(year->semester[semester].endDate.month) <= 12) && (stoi(year->semester[semester].startDate.month) < stoi(year->semester[semester].endDate.month))) {
 				return true;
 			}
@@ -290,7 +290,12 @@ bool checkDateSemester(Schoolyear*& year, int& semester) {
 				return false;
 			}
 		}
-		else if (semester == 1) {
+		else {
+			return false;
+		}
+	}
+	else if (semester == 1) {
+		if (stoi(year->semester[semester].startDate.year) == schoolYearEnd && stoi(year->semester[semester].startDate.year) == schoolYearEnd) {
 			if ((stoi(year->semester[semester].startDate.month) >= 1) && (stoi(year->semester[semester].endDate.month) <= 4) && (stoi(year->semester[semester].startDate.month) < stoi(year->semester[semester].endDate.month))) {
 				return true;
 			}
@@ -299,12 +304,20 @@ bool checkDateSemester(Schoolyear*& year, int& semester) {
 			}
 		}
 		else {
+			return false;
+		}
+	}
+	else {
+		if (stoi(year->semester[semester].startDate.year) == schoolYearEnd && stoi(year->semester[semester].startDate.year) == schoolYearEnd) {
 			if ((stoi(year->semester[semester].startDate.month) >= 5) && (stoi(year->semester[semester].endDate.month) <= 8) && (stoi(year->semester[semester].startDate.month) < stoi(year->semester[semester].endDate.month))) {
 				return true;
 			}
 			else {
 				return false;
 			}
+		}
+		else {
+			return false;
 		}
 	}
 	return false;
@@ -363,6 +376,9 @@ bool checkDateRegis1(Schoolyear*& year, int& semester) {
 			return false;
 		}
 	}
+}
+
+bool checkDateRegis2(Schoolyear*& year, int& semester) {
 	if (stoi(year->courseRegis[semester].endDate.year) <= stoi(year->semester[semester].endDate.year)) {
 		if (stoi(year->courseRegis[semester].endDate.month) <= stoi(year->semester[semester].endDate.month)) {
 			if (stoi(year->courseRegis[semester].endDate.day) <= stoi(year->semester[semester].endDate.day)) {
@@ -379,7 +395,7 @@ bool checkDateRegis1(Schoolyear*& year, int& semester) {
 	return false;
 }
 
-bool checkDateRegis2(Schoolyear*& year, int& semester) {
+bool checkDateRegis3(Schoolyear*& year, int& semester) {
 	if (stoi(year->courseRegis[semester].startDate.year) <= stoi(year->courseRegis[semester].endDate.year)) {
 		if (stoi(year->courseRegis[semester].startDate.month) <= stoi(year->courseRegis[semester].endDate.month)) {
 			if (stoi(year->courseRegis[semester].startDate.day) <= stoi(year->courseRegis[semester].endDate.day)) {
@@ -427,25 +443,30 @@ void createCourseRegistration(Schoolyear*& year, int& semester) {
 		cin >> year->semester[semester].endDate.month;
 		cout << "Enter end year: ";
 		cin >> year->semester[semester].endDate.year;
-		cout << "Enter start date of this course registration: " << endl;
-		cout << "Enter start day: ";
-		cin >> year->courseRegis[semester].startDate.day;
-		cout << "Enter start month: ";
-		cin >> year->courseRegis[semester].startDate.month;
-		cout << "Enter start year: ";
-		cin >> year->courseRegis[semester].startDate.year;
-		cout << "Enter end date of this course registration: " << endl;
-		cout << "Enter end day: ";
-		cin >> year->courseRegis[semester].endDate.day;
-		cout << "Enter end month: ";
-		cin >> year->courseRegis[semester].endDate.month;
-		cout << "Enter end year: ";
-		cin >> year->courseRegis[semester].endDate.year;
-		if (checkDateRegis1(year, semester) && checkDateRegis2(year, semester)) {
-			break;
+		if (checkDateSemester(year, semester)) {
+			cout << "Enter start date of this course registration: " << endl;
+			cout << "Enter start day: ";
+			cin >> year->courseRegis[semester].startDate.day;
+			cout << "Enter start month: ";
+			cin >> year->courseRegis[semester].startDate.month;
+			cout << "Enter start year: ";
+			cin >> year->courseRegis[semester].startDate.year;
+			cout << "Enter end date of this course registration: " << endl;
+			cout << "Enter end day: ";
+			cin >> year->courseRegis[semester].endDate.day;
+			cout << "Enter end month: ";
+			cin >> year->courseRegis[semester].endDate.month;
+			cout << "Enter end year: ";
+			cin >> year->courseRegis[semester].endDate.year;
+			if (checkDateRegis1(year, semester) && checkDateRegis2(year, semester) && checkDateRegis3(year, semester)) {
+				break;
+			}
+			else {
+				cout << "Your date you inputed is invalid. Please enter again!!!" << endl;
+			}
 		}
 		else {
-			cout << "Your date you inputed is invalid. Please enter again!!!" << endl;
+			cout << "Your date of semester is invalid. Please enter again!!!" << endl;
 		}
 	}
 	string startDateSem = year->semester[semester].startDate.day + "/" + year->semester[semester].startDate.month + "/" + year->semester[semester].startDate.year;

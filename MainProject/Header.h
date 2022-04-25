@@ -92,6 +92,8 @@ bool checkDateRegis1(Schoolyear*&, int&);
 
 bool checkDateRegis2(Schoolyear*&, int&);
 
+bool checkDateRegis2(Schoolyear*&, int&);
+
 void createCourseRegistration(Schoolyear*&, int&);
 
 void addCourse(Course*&);
