@@ -74,8 +74,10 @@ int main() {
 					createNewYear(schoolYear);
 				}
 				else {
-					yearNode2 = yearHead1;
-					loadInfoCourse(yearNode2, semester);
+					if (checkUser == false) {
+						yearNode2 = yearHead1;
+						loadInfoCourse(yearNode2, semester);
+					}
 					int optionEnroll;
 					while (true) {
 						cout << "1. Enroll in a course" << endl;
