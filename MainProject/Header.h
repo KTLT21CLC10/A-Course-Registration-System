@@ -96,15 +96,15 @@ bool checkDateRegis2(Schoolyear*&, int&);
 
 void createCourseRegistration(Schoolyear*&, int&);
 
-void addCourse(Course*&);
+void addCourse(Schoolyear*&, int&, int&);
 
 void viewCourse(Course*, int&);
 
 void updateCourse(Schoolyear*, int);
 
-void deleteCourse(Schoolyear*&, int);
+void deleteCourse(Schoolyear*&, int, int&);
 
-void saveInfoCourseStaff(Course*&, Schoolyear*&, int&);
+void saveInfoCourseStaff(Course*&, Schoolyear*&, int&, int&);
 
 void loadInfoCourse(Schoolyear*&, int&);
 

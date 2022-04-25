@@ -150,6 +150,7 @@ int main() {
 			}
 			else if (option == 7) {
 				system("cls");
+				int numOfSubj;
 				if (user < 0) {
 					createCourseRegistration(yearNode2, semester);
 					int optionSub;
@@ -163,7 +164,7 @@ int main() {
 						cin >> optionSub;
 						if (optionSub == 1) {
 							system("cls");
-							addCourse(yearNode2->semester[semester].course);
+							addCourse(yearNode2, semester, numOfSubj);
 						}
 						else if (optionSub == 2) {
 							system("cls");
@@ -176,10 +177,10 @@ int main() {
 						}
 						else if (optionSub == 4) {
 							system("cls");
-							deleteCourse(yearNode2, semester);
+							deleteCourse(yearNode2, semester, numOfSubj);
 						}
 						else {
-							saveInfoCourseStaff(yearNode2->semester[semester].course, yearNode2, semester);
+							saveInfoCourseStaff(yearNode2->semester[semester].course, yearNode2, semester, numOfSubj);
 							break;
 						}
 					}

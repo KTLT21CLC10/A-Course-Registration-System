@@ -515,8 +515,10 @@ void createCourseRegistration(Schoolyear*& year, int& semester) {
 	}
 }
 
-void addCourse(Course*& course) {
+void addCourse(Schoolyear*& year, int& semester, int& no) {
+	int numOfSubject;
 	Course* tempCourse = new Course;
+	viewCourse(year->semester[semester].course, numOfSubject);
 	cout << "Enter information of the course you want to add: " << endl;
 	tempCourse->NumOfStu = 0;
 	cout << "Enter course ID: ";
@@ -536,9 +538,11 @@ void addCourse(Course*& course) {
 	getline(cin, tempCourse->Day2);
 	cout << "Enter session 2: ";
 	getline(cin, tempCourse->Session2);
-	tempCourse->CourseNext = course;
-	course = tempCourse;
+	tempCourse->CourseNext = year->semester[semester].course;
+	year->semester[semester].course = tempCourse;
+	numOfSubject++;
 	cout << "Add new course successfully!!!" << endl;
+	no = numOfSubject;
 }
 
 void viewCourse(Course* course, int& noCourse) {
@@ -654,7 +658,7 @@ void updateCourse(Schoolyear* year, int semester) {
 	cout << "Update course successfully!!!" << endl;
 }
 
-void deleteCourse(Schoolyear*& year, int semester) {
+void deleteCourse(Schoolyear*& year, int semester, int& no) {
 	Course* courseCur = year->semester[semester].course;
 	int numOfSubject = 1, option;
 	viewCourse(year->semester[semester].course, numOfSubject);
@@ -686,16 +690,19 @@ void deleteCourse(Schoolyear*& year, int semester) {
 			courseCur->CourseNext = courseCur->CourseNext->CourseNext;
 			delete tempCourse;
 			cout << "Delete course successfully!!!" << endl;
+			numOfSubject--;
 		}
 	}
 	else {
 		cout << "Invalid input. Please enter again!!!" << endl;
 	}
+	no = numOfSubject;
 }
 
-void saveInfoCourseStaff(Course*& course, Schoolyear*& year, int& semester) {
+void saveInfoCourseStaff(Course*& course, Schoolyear*& year, int& semester, int& numOfSubject) {
 	string temp;
 	ofstream fout("Data of " + year->schoolYear + "_" + to_string(semester + 1) + ".csv");
+	fout << numOfSubject << ",,,,,,,," << endl;
 	while (course != NULL) {
 		fout << course->CourseID << "," << course->CourseName << ","
 			<< course->StaffName << "," << course->NumOfCredit << ","
