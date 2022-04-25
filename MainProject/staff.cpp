@@ -282,7 +282,7 @@ bool checkDateSemester(Schoolyear*& year, int& semester) {
 	int schoolYearStart = (int)(year->schoolYear[0]) * 1000 + (int)(year->schoolYear[1]) * 100 + (int)(year->schoolYear[2]) * 10 + (int)(year->schoolYear[3]) - 53328;
 	int schoolYearEnd = (int)(year->schoolYear[5]) * 1000 + (int)(year->schoolYear[6]) * 100 + (int)(year->schoolYear[7]) * 10 + (int)(year->schoolYear[8]) - 53328;
 	if (semester == 0) {
-		if (stoi(year->semester[semester].startDate.year) == schoolYearStart && stoi(year->semester[semester].startDate.year) == schoolYearStart) {
+		if (stoi(year->semester[semester].startDate.year) == schoolYearStart && stoi(year->semester[semester].endDate.year) == schoolYearStart) {
 			if ((stoi(year->semester[semester].startDate.month) >= 9) && (stoi(year->semester[semester].endDate.month) <= 12) && (stoi(year->semester[semester].startDate.month) < stoi(year->semester[semester].endDate.month))) {
 				return true;
 			}
@@ -295,7 +295,7 @@ bool checkDateSemester(Schoolyear*& year, int& semester) {
 		}
 	}
 	else if (semester == 1) {
-		if (stoi(year->semester[semester].startDate.year) == schoolYearEnd && stoi(year->semester[semester].startDate.year) == schoolYearEnd) {
+		if (stoi(year->semester[semester].startDate.year) == schoolYearEnd && stoi(year->semester[semester].endDate.year) == schoolYearEnd) {
 			if ((stoi(year->semester[semester].startDate.month) >= 1) && (stoi(year->semester[semester].endDate.month) <= 4) && (stoi(year->semester[semester].startDate.month) < stoi(year->semester[semester].endDate.month))) {
 				return true;
 			}
@@ -308,7 +308,7 @@ bool checkDateSemester(Schoolyear*& year, int& semester) {
 		}
 	}
 	else {
-		if (stoi(year->semester[semester].startDate.year) == schoolYearEnd && stoi(year->semester[semester].startDate.year) == schoolYearEnd) {
+		if (stoi(year->semester[semester].startDate.year) == schoolYearEnd && stoi(year->semester[semester].endDate.year) == schoolYearEnd) {
 			if ((stoi(year->semester[semester].startDate.month) >= 5) && (stoi(year->semester[semester].endDate.month) <= 8) && (stoi(year->semester[semester].startDate.month) < stoi(year->semester[semester].endDate.month))) {
 				return true;
 			}
