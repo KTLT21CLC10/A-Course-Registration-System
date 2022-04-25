@@ -64,7 +64,9 @@ void gotoxy(int, int);
 
 void inputAccount(string&, string&);
 
-void loadInfoStaff(Staff*&, int&);
+void loadAccountStaff(Staff*&, int&);
+
+void loadAccountStu(Schoolyear*&);
 
 bool checkUserStaff(string);
 
@@ -78,7 +80,7 @@ void changePass(int, Schoolyear*, Staff*, int);
 
 void createNewYear(string);
 
-void createNewClass(Class*&, int&);
+void createNewClass(string, Class*&, int&);
 
 void loadInfoStudent(Schoolyear*&);
 
@@ -100,11 +102,17 @@ void updateCourse(Schoolyear*, int);
 
 void deleteCourse(Schoolyear*&, int);
 
-void enrollCourse(Schoolyear*, Course*, int, int&);
+void loadInfoCourse(Schoolyear*&, int&);
+
+void saveInfoCourse(Course*&, string);
+
+void enrollCourse(Schoolyear*, Course*, int, int&, string);
+
+void viewListEnrollCourse(string);
 
 void removeCourseEnrolled(Schoolyear*, Course*, int);
 
-void viewListClasses(Schoolyear*);
+void viewListClasses(Class*&);
 
 void viewListStudentInClass(Schoolyear*);
 

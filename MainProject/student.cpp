@@ -2,7 +2,61 @@
 #include <fstream>
 using namespace std;
 
-void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption) {
+void loadInfoCourse(Schoolyear*& year, int& semester) {
+	string schoolYear;
+	cout << "Enter school year of you: ";
+	cin >> schoolYear;
+	cout << "Enter semester: ";
+	cin >> semester;
+	semester--;
+	string temp;
+	ifstream fin("Data of " + schoolYear + "_" + to_string(semester + 1) + ".csv");
+	if (!fin.is_open()) {
+		cout << "No information of your course!!!" << endl;
+	}
+	else {
+		string tempNum;
+		Course* courseCur = NULL;
+		getline(fin, temp, ',');
+		int numOfSubject = stoi(temp);
+		getline(fin, temp);
+		for (int i = 0; i < numOfSubject; i++) {
+			if (year->semester[semester].course == NULL) {
+				year->semester[semester].course = new Course;
+				courseCur = year->semester[semester].course;
+			}
+			else {
+				courseCur->CourseNext = new Course;
+				courseCur = courseCur->CourseNext;
+			}
+			getline(fin, courseCur->CourseID, ',');
+			getline(fin, courseCur->CourseName, ',');
+			getline(fin, courseCur->StaffName, ',');
+			getline(fin, courseCur->NumOfCredit, ',');
+			getline(fin, tempNum, ',');
+			getline(fin, courseCur->Day1, ',');
+			getline(fin, courseCur->Session1, ',');
+			getline(fin, courseCur->Day2, ',');
+			getline(fin, courseCur->Session2);
+			courseCur->NumOfStu = stoi(tempNum);
+			courseCur->CourseNext = NULL;
+		}
+	}
+}
+
+void saveInfoCourse(Course*& courseCur, string studentID) {
+	ofstream fout("Course enrolled of " + studentID + ".csv");
+	while (courseCur != NULL) {
+		fout << courseCur->CourseID << "," << courseCur->CourseName << ","
+			<< courseCur->StaffName << "," << courseCur->NumOfCredit << ","
+			<< courseCur->NumOfStu << "," << courseCur->Day1 << ","
+			<< courseCur->Session1 << "," << courseCur->Day2 << "," << courseCur->Session2 << endl;
+		courseCur = courseCur->CourseNext;
+	}
+}
+
+void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption, string studentID) {
+	ofstream fout("Course enrolled of " + studentID + ".csv");
 	int option;
 	int i = user - 1;
 	int j = user - 1;
@@ -27,7 +81,7 @@ void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption) 
 			}
 		}
 		if (option == 0) {
-			return;
+			break;
 		}
 		int count = 1;
 		while (courseCur != NULL && count != option) {
@@ -98,6 +152,10 @@ void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption) 
 					numOfOption++;
 					courseCur->NumOfStu++;
 					courseEnroll->NumOfStu = courseCur->NumOfStu;
+					fout << courseEnroll->CourseID << "," << courseEnroll->CourseName << ","
+						<< courseEnroll->StaffName << "," << courseEnroll->NumOfCredit << ","
+						<< courseEnroll->NumOfStu << "," << courseEnroll->Day1 << ","
+						<< courseEnroll->Session1 << "," << courseEnroll->Day2 << "," << courseEnroll->Session2 << endl;
 					courseEnroll->CourseNext = NULL;
 				}
 				else {
@@ -111,6 +169,63 @@ void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption) 
 				goto enrollSession;
 			}
 		}
+	}
+}
+
+void viewListEnrollCourse(string studentID) {
+	ifstream fin("Course enrolled of " + studentID + ".csv");
+	string courseID, nameCourse, nameTeacher, numOfStu, numOfCre, day1, session1, day2, session2;
+	int no = 1;
+	int y = 16, a = 20;
+	cout << endl;
+	gotoxy(8, 15);
+	cout << "Course ID";
+	gotoxy(a, 15);
+	a = a + 30;
+	cout << "Name of course";
+	gotoxy(a, 15);
+	a = a + 10;
+	cout << "Teacher";
+	gotoxy(a, 15);
+	a = a + 10;
+	cout << "Credits";
+	gotoxy(a, 15);
+	a = a + 22;
+	cout << "Number of students";
+	gotoxy(a, 15);
+	cout << "Day of week and session";
+	while (!fin.eof()) {
+		int x = 20;
+		gotoxy(6, y);
+		cout << no;
+		gotoxy(8, y);
+		getline(fin, courseID, ',');
+		cout << courseID;
+		gotoxy(x, y);
+		x = x + 30;
+		getline(fin, nameCourse, ',');
+		cout << nameCourse;
+		gotoxy(x, y);
+		x = x + 13;
+		getline(fin, nameTeacher, ',');
+		cout << nameTeacher;
+		gotoxy(x, y);
+		x = x + 14;
+		getline(fin, numOfCre, ',');
+		cout << numOfCre;
+		gotoxy(x, y);
+		x = x + 15;
+		getline(fin, numOfStu, ',');
+		cout << numOfStu << "/" << 50;
+		gotoxy(x, y);
+		getline(fin, day1, ',');
+		getline(fin, session1, ',');
+		getline(fin, day2, ',');
+		getline(fin, session2);
+		cout << "On " << day1 << " in " << session1 << " and " << day2 << " in " << session2;
+		y = y + 1;
+		no++;
+		cout << endl;
 	}
 }
 
@@ -170,23 +285,34 @@ void removeCourseEnrolled(Schoolyear* year, Course* course, int user) {
 	cout << "Remove course you enrolled succesfully!!!" << endl;
 }
 
-void viewListClasses(Schoolyear* year) {
+void viewListClasses(Class*& classes) {
 	string schoolYear;
-	cout << "Enter the year you want to view the list of classes: ";
-	cin >> schoolYear;
-	cout << endl;
-	while (year != NULL) {
-		if (schoolYear == year->schoolYear) {
-			for (int i = 0; i < year->numOfClass; i++) {
-				cout << i + 1 << "." << year->Class[i].nameOfClass;
-				cout << endl;
-			}
+	while (true) {
+		cout << "Enter the year you want to view the list of classes: ";
+		cin >> schoolYear;
+		cout << endl;
+		ifstream fin(schoolYear + ".csv");
+		if (fin.is_open()) {
 			break;
 		}
-		year = year->yearNext;
+		else if (fin.peek() == std::ifstream::traits_type::eof()) {
+			cout << "Your school year has not class to view!!!" << endl;
+		}
+		else {
+			cout << "Your school year has not been created!!!" << endl;
+		}
 	}
-	if (year == NULL) {
-		cout << "Invalid input. The year you entered was not created!!!" << endl;
+	string temp, tempNo, numOfClass;
+	ifstream fin(schoolYear + ".csv");
+	getline(fin, numOfClass, ',');
+	classes = new Class[stoi(numOfClass)];
+	getline(fin, temp);
+	for (int i = 0; i < stoi(numOfClass); i++) {
+		getline(fin, tempNo, ',');
+		getline(fin, classes[i].nameOfClass);
+	}
+	for (int j = 0; j < stoi(numOfClass); j++) {
+		cout << j + 1  << " " << classes[j].nameOfClass << endl;
 	}
 }
 

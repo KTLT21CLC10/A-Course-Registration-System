@@ -21,20 +21,59 @@ void inputAccount(string& username, string& password) {
 	cout << endl;
 }
 
-void loadInfoStaff(Staff*& staff, int& numOfStaff) {
-	ifstream fin("StaffAccount.csv");
-	string temp;
-	getline(fin, temp, ',');
-	numOfStaff = stoi(temp);
-	staff = new Staff[stoi(temp)];
-	getline(fin, temp);
+void loadAccountStaff(Staff*& staff, int& numOfStaff) {
+	ifstream finStaff("StaffAccount.csv");
+	string tempStaff;
+	getline(finStaff, tempStaff, ',');
+	numOfStaff = stoi(tempStaff);
+	staff = new Staff[stoi(tempStaff)];
+	getline(finStaff, tempStaff);
 	for (int i = 0; i < numOfStaff; i++) {
-		getline(fin, staff[i].firstName, ',');
-		getline(fin, staff[i].lastName, ',');
-		getline(fin, staff[i].gender, ',');
-		getline(fin, staff[i].email, ',');
-		getline(fin, staff[i].user, ',');
-		getline(fin, staff[i].pass);
+		getline(finStaff, staff[i].firstName, ',');
+		getline(finStaff, staff[i].lastName, ',');
+		getline(finStaff, staff[i].gender, ',');
+		getline(finStaff, staff[i].email, ',');
+		getline(finStaff, staff[i].user, ',');
+		getline(finStaff, staff[i].pass);
+	}
+}
+
+void loadAccountStu(Schoolyear*& year) {
+	if (year == NULL) {
+		year = new Schoolyear;
+	}
+	ifstream finStu("StudentAccount.csv");
+	if (finStu.is_open()) {
+		string numOfClass, numOfStu, nameOfClass;
+		getline(finStu, numOfClass, ',');
+		year->numOfClass = stoi(numOfClass);
+		year->Class = new Class[year->numOfClass];
+		getline(finStu, numOfClass);
+		for (int i = 0; i < year->numOfClass; i++) {
+			getline(finStu, nameOfClass, ',');
+			year->Class[i].nameOfClass = nameOfClass;
+			getline(finStu, nameOfClass);
+			getline(finStu, numOfStu, ',');
+			if (numOfStu == ",,,,,,") {
+				continue;
+			}
+			else {
+				year->Class[i].numOfStudent = stoi(numOfStu);
+				year->Class[i].student = new Student[stoi(numOfStu)];
+				getline(finStu, numOfStu);
+				for (int j = 0; j < year->Class[i].numOfStudent; j++) {
+					getline(finStu, year->Class[i].student[j].num, ',');
+					getline(finStu, year->Class[i].student[j].StudentID, ',');
+					getline(finStu, year->Class[i].student[j].firstName, ',');
+					getline(finStu, year->Class[i].student[j].lastName, ',');
+					getline(finStu, year->Class[i].student[j].gender, ',');
+					getline(finStu, year->Class[i].student[j].dateOfBirth, ',');
+					getline(finStu, year->Class[i].student[j].SocialID, ',');
+					getline(finStu, year->Class[i].student[j].pass);
+					year->Class[i].student[j].enrolled = NULL;
+				}
+			}
+		}
 	}
 }
 
@@ -151,14 +190,28 @@ void createNewYear(string schoolyear) {
 	cout << "Create new school year successfully!!!" << endl;
 }
 
-void createNewClass(Class*& classes, int& numOfClass) {
+void createNewClass(string schoolYear, Class*& classes, int& numOfClass) {
+	while (true) {
+		cout << "Enter the year you want to create several classes: ";
+		cin >> schoolYear;
+		ifstream fin(schoolYear + ".csv");
+		if (fin.is_open()) {
+			break;
+		}
+		else {
+			cout << "Your school year has not been created!!!" << endl;
+		}
+	}
 	cout << "Enter number of class you want to create: ";
 	cin >> numOfClass;
 	classes = new Class[numOfClass];
 	cout << "Enter name of classes you want to create: " << endl;
+	ofstream fout(schoolYear + ".csv");
+	fout << numOfClass << ",," << endl;
 	for (int i = 0; i < numOfClass; i++) {
 		cout << "Enter class " << i + 1 << ": ";
 		cin >> classes[i].nameOfClass;
+		fout << i + 1 << "," << classes[i].nameOfClass << "," << endl;
 		ofstream fout(classes[i].nameOfClass + ".csv");
 		cout << "Class " << classes[i].nameOfClass << " was created successfully!!!" << endl;
 	}
@@ -169,7 +222,7 @@ void loadInfoStudent(Schoolyear*& year) {
 		year = new Schoolyear;
 	}
 	while (true) {
-		cout << "Enter your school year you created: ";
+		cout << "Enter your school year you created to load information: ";
 		cin >> year->schoolYear;
 		ifstream fin(year->schoolYear + ".csv");
 		if (fin.is_open()) {
@@ -179,29 +232,28 @@ void loadInfoStudent(Schoolyear*& year) {
 			cout << "Your school year has not been created!!!" << endl;
 		}
 	}
-	cout << "Enter number of classes you want to load info: ";
-	cin >> year->numOfClass;
-	cin.ignore();
+	string numOfClass, tempNum;
+	ifstream finYear(year->schoolYear + ".csv");
+	ofstream fout("StudentAccount.csv");
+	getline(finYear, numOfClass, ',');
+	year->numOfClass = stoi(numOfClass);
+	fout << numOfClass << ",,,,,,," << endl;
 	year->Class = new Class[year->numOfClass];
+	getline(finYear, tempNum);
 	for (int i = 0; i < year->numOfClass; i++) {
-		while (true) {
-			cout << "Enter name of the classes: ";
-			getline(cin, year->Class[i].nameOfClass);
-			ifstream fin(year->Class[i].nameOfClass + ".csv");
-			if (fin.is_open()) {
-				break;
-			}
-			else {
-				cout << "Your class has not been created!!!" << endl;
-			}
-		}
+		string tempNo;
+		getline(finYear, tempNo, ',');
+		getline(finYear, year->Class[i].nameOfClass);
+		
 		string temp;
 		ifstream fin(year->Class[i].nameOfClass + ".csv");
-		if (fin.peek() == std::ifstream::traits_type::eof()) {
-			cout << "No information to load!!! Please choose another class" << endl;
+		getline(fin, temp, ',');
+		if (temp == "\n") {
+			cout << "Your class " << year->Class[i].nameOfClass << " do not have information to load!!!" << endl;
 		}
 		else {
-			getline(fin, temp, ',');
+			fout << year->Class[i].nameOfClass << ",,,,,,," << endl;
+			fout << temp << ",,,,,,," << endl;
 			year->Class[i].numOfStudent = stoi(temp);
 			year->Class[i].student = new Student[stoi(temp)];
 			getline(fin, temp);
@@ -215,6 +267,10 @@ void loadInfoStudent(Schoolyear*& year) {
 				getline(fin, year->Class[i].student[j].SocialID, ',');
 				getline(fin, year->Class[i].student[j].pass);
 				year->Class[i].student[j].enrolled = NULL;
+				fout << year->Class[i].student[j].num << "," << year->Class[i].student[j].StudentID << ","
+					<< year->Class[i].student[j].firstName << "," << year->Class[i].student[j].lastName << ","
+					<< year->Class[i].student[j].gender << "," << year->Class[i].student[j].dateOfBirth << ","
+					<< year->Class[i].student[j].SocialID << "," << year->Class[i].student[j].pass << endl;
 			}
 			cout << "Load information of class " << year->Class[i].nameOfClass << " successfully!!!" << endl;
 		}
@@ -404,9 +460,11 @@ void createCourseRegistration(Schoolyear*& year, int& semester) {
 		cout << "Load data failed. Make sure you was create this semester!!!" << endl;
 	}
 	else {
+		ofstream fout("Data of " + schoolYear + "_" + to_string(semester + 1) + ".csv");
 		Course* courseCur = NULL;
 		getline(fin, temp, ',');
 		int numOfSubject = stoi(temp);
+		fout << numOfSubject << ",,,,,,,," << endl;
 		getline(fin, temp);
 		for (int i = 0;i < numOfSubject; i++) {
 			if (year->semester[semester].course == NULL) {
@@ -427,6 +485,10 @@ void createCourseRegistration(Schoolyear*& year, int& semester) {
 			getline(fin, courseCur->Session2);
 			courseCur->NumOfStu = 0;
 			courseCur->CourseNext = NULL;
+			fout << courseCur->CourseID << "," << courseCur->CourseName << ","
+				<< courseCur->StaffName << "," << courseCur->NumOfCredit << ","
+				<< courseCur->NumOfStu << "," << courseCur->Day1 << ","
+				<< courseCur->Session1 << "," << courseCur->Day2 << "," << courseCur->Session2 << endl;
 		}
 		cout << "Load data of course successfully." << endl << endl;
 	}

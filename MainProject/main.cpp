@@ -3,11 +3,28 @@
 using namespace std;
 
 int main() {
-	Schoolyear* yearHead = NULL, * yearNode1 = NULL, * yearNode2 = NULL;
+	Schoolyear* yearHead1 = NULL, *yearHead2 = NULL, * yearNode1 = NULL, * yearNode2 = NULL;
 	Staff* staff;
 	string username, password;
 	int option, numOfStaff, semester = 0;
-	loadInfoStaff(staff, numOfStaff);
+	bool checkUser;
+	loadAccountStaff(staff, numOfStaff);
+	checkUser = true;
+	ifstream in("StudentAccount.csv");
+	if (in.is_open()) {
+		if (yearHead1 == NULL)
+		{
+			loadAccountStu(yearHead1);
+			yearNode1 = yearHead1;
+			checkUser = false;
+		}
+		else
+		{
+			loadAccountStu(yearNode1->yearNext);
+			yearNode1 = yearNode1->yearNext;
+			checkUser = false;
+		}
+	}
 	do {
 		system("cls");
 		inputAccount(username, password);
@@ -15,7 +32,7 @@ int main() {
 		if (user == 0) {
 			cout << "Your username or password is incorrect!!!" << endl;
 			password = "";
-			yearNode1 = yearHead;
+			yearNode1 = yearHead1;
 			continue;
 		}
 		while (true) {
@@ -57,6 +74,8 @@ int main() {
 					createNewYear(schoolYear);
 				}
 				else {
+					yearNode2 = yearHead1;
+					loadInfoCourse(yearNode2, semester);
 					int optionEnroll;
 					while (true) {
 						cout << "1. Enroll in a course" << endl;
@@ -67,16 +86,16 @@ int main() {
 						cin >> optionEnroll;
 						if (optionEnroll == 1) {
 							system("cls");
-							enrollCourse(yearNode1, yearNode2->semester[semester].course, user, yearNode1->Class[user - 1].student[user - 1].numOfSubject);
+							enrollCourse(yearNode1, yearNode2->semester[semester].course, user, yearNode1->Class[user - 1].student[user - 1].numOfSubject, yearNode1->Class[user - 1].student[user - 1].StudentID);
 						}
 						else if (optionEnroll == 2) {
 							system("cls");
-							int numOfSubject;
-							viewCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, numOfSubject);
+							viewListEnrollCourse(yearNode1->Class[user - 1].student[user - 1].StudentID);
 						}
 						else if (optionEnroll == 3) {
 							system("cls");
 							removeCourseEnrolled(yearNode1, yearNode2->semester[semester].course, user);
+							saveInfoCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, yearNode1->Class[user - 1].student[user - 1].StudentID);
 						}
 						else {
 							break;
@@ -87,23 +106,23 @@ int main() {
 			else if (option == 4) {
 				system("cls");
 				if (user < 0) {
+					string schoolYear;
 					Class* Class;
 					int numOfClass;
 					system("cls");
-					createNewClass(Class, numOfClass);
+					createNewClass(schoolYear, Class, numOfClass);
 				}
 				else {
-					int numOfSubject;
-					viewCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, numOfSubject);
+					viewListEnrollCourse(yearNode1->Class[user - 1].student[user - 1].StudentID);
 				}
 			}
 			else if (option == 5) {
 				system("cls");
 				if (user < 0) {
-					if (yearHead == NULL)
+					if (yearHead1 == NULL)
 					{
-						loadInfoStudent(yearHead);
-						yearNode1 = yearHead;
+						loadInfoStudent(yearHead1);
+						yearNode1 = yearHead1;
 					}
 					else
 					{
@@ -112,18 +131,19 @@ int main() {
 					}
 				}
 				else {
-					viewListClasses(yearHead);
+					Class* classes;
+					viewListClasses(classes);
 				}
 			}
 			else if (option == 6) {
 				system("cls");
 				if (user < 0)
 				{
-					yearNode2 = yearHead;
+					yearNode2 = yearHead1;
 					createSemester(yearNode2, semester);
 				}
 				else {
-					viewListStudentInClass(yearHead);
+					viewListStudentInClass(yearHead1);
 				}
 			}
 			else if (option == 7) {
@@ -171,7 +191,7 @@ int main() {
 				viewListStudentInCourse(yearNode2, semester);
 			}
 			else {
-				yearNode1 = yearHead;
+				yearNode1 = yearHead1;
 				break;
 			}
 		}
