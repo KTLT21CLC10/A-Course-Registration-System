@@ -21,6 +21,9 @@ void loadInfoCourse(Schoolyear*& year, int& semester) {
 		int numOfSubject = stoi(temp);
 		getline(fin, temp);
 		for (int i = 0; i < numOfSubject; i++) {
+			if (year == NULL) {
+				year = new Schoolyear;
+			}
 			if (year->semester[semester].course == NULL) {
 				year->semester[semester].course = new Course;
 				courseCur = year->semester[semester].course;

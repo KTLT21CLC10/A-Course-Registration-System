@@ -152,38 +152,84 @@ int main() {
 				system("cls");
 				int numOfSubj;
 				if (user < 0) {
-					createCourseRegistration(yearNode2, semester);
-					int optionSub;
+					int option1;
 					while (true) {
-						cout << "1. Add a course" << endl;
-						cout << "2. View list of courses" << endl;
-						cout << "3. Update course" << endl;
-						cout << "4. Delete course" << endl;
-						cout << "0. Back" << endl;
-						cout << "Enter your choice: ";
-						cin >> optionSub;
-						if (optionSub == 1) {
-							system("cls");
-							addCourse(yearNode2, semester, numOfSubj);
-						}
-						else if (optionSub == 2) {
-							system("cls");
-							int numOfSub;
-							viewCourse(yearNode2->semester[semester].course, numOfSub);
-						}
-						else if (optionSub == 3) {
-							system("cls");
-							updateCourse(yearNode2, semester);
-						}
-						else if (optionSub == 4) {
-							system("cls");
-							deleteCourse(yearNode2, semester, numOfSubj);
+						cout << "1. Create a new semester." << endl;
+						cout << "2. Load the old data." << endl;
+						cout << "Enter your option: ";
+						cin >> option1;
+						if (option1 == 1) {
+							createCourseRegistration(yearNode2, semester);
+							int optionSub;
+							while (true) {
+								cout << "1. Add a course" << endl;
+								cout << "2. View list of courses" << endl;
+								cout << "3. Update course" << endl;
+								cout << "4. Delete course" << endl;
+								cout << "0. Back" << endl;
+								cout << "Enter your choice: ";
+								cin >> optionSub;
+								if (optionSub == 1) {
+									system("cls");
+									addCourse(yearNode2, semester, numOfSubj);
+								}
+								else if (optionSub == 2) {
+									system("cls");
+									int numOfSub;
+									viewCourse(yearNode2->semester[semester].course, numOfSub);
+								}
+								else if (optionSub == 3) {
+									system("cls");
+									updateCourse(yearNode2, semester);
+								}
+								else if (optionSub == 4) {
+									system("cls");
+									deleteCourse(yearNode2, semester, numOfSubj);
+								}
+								else {
+									saveInfoCourseStaff(yearNode2->semester[semester].course, yearNode2, semester, numOfSubj);
+									break;
+								}
+							}
+							break;
 						}
 						else {
-							saveInfoCourseStaff(yearNode2->semester[semester].course, yearNode2, semester, numOfSubj);
+							loadInfoCourse(yearNode2, semester);
+							int optionSub;
+							while (true) {
+								cout << "1. Add a course" << endl;
+								cout << "2. View list of courses" << endl;
+								cout << "3. Update course" << endl;
+								cout << "4. Delete course" << endl;
+								cout << "0. Back" << endl;
+								cout << "Enter your choice: ";
+								cin >> optionSub;
+								if (optionSub == 1) {
+									system("cls");
+									addCourse(yearNode2, semester, numOfSubj);
+								}
+								else if (optionSub == 2) {
+									system("cls");
+									int numOfSub;
+									viewCourse(yearNode2->semester[semester].course, numOfSub);
+								}
+								else if (optionSub == 3) {
+									system("cls");
+									updateCourse(yearNode2, semester);
+								}
+								else if (optionSub == 4) {
+									system("cls");
+									deleteCourse(yearNode2, semester, numOfSubj);
+								}
+								else {
+									saveInfoCourseStaff(yearNode2->semester[semester].course, yearNode2, semester, numOfSubj);
+									break;
+								}
+							}
 							break;
 						}
 					}
+					
 				}
 				else {
 					int numOfSubject;
