@@ -2,7 +2,8 @@
 #include <fstream>
 using namespace std;
 
-void loadInfoCourse(Schoolyear*& year, int& semester) {
+void loadInfoCourse(Schoolyear*& year, int& semester, int& no) {
+	int numOfSubject;
 	string schoolYear;
 	cout << "Enter school year of you: ";
 	cin >> schoolYear;
@@ -18,7 +19,7 @@ void loadInfoCourse(Schoolyear*& year, int& semester) {
 		string tempNum;
 		Course* courseCur = NULL;
 		getline(fin, temp, ',');
-		int numOfSubject = stoi(temp);
+		numOfSubject = stoi(temp);
 		getline(fin, temp);
 		for (int i = 0; i < numOfSubject; i++) {
 			if (year == NULL) {
@@ -45,10 +46,12 @@ void loadInfoCourse(Schoolyear*& year, int& semester) {
 			courseCur->CourseNext = NULL;
 		}
 	}
+	no = numOfSubject;
 }
 
-void saveInfoCourse(Course*& courseCur, string studentID) {
+void saveInfoCourse(Course*& courseCur, string studentID, int& no) {
 	ofstream fout("Course enrolled of " + studentID + ".csv");
+	fout << no << ",,,,,,,," << endl;
 	while (courseCur != NULL) {
 		fout << courseCur->CourseID << "," << courseCur->CourseName << ","
 			<< courseCur->StaffName << "," << courseCur->NumOfCredit << ","
@@ -58,8 +61,9 @@ void saveInfoCourse(Course*& courseCur, string studentID) {
 	}
 }
 
-void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption, string studentID) {
-	ofstream fout("Course enrolled of " + studentID + ".csv");
+void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption, int& no) {
+	int noEnroll = 0;
+	/*ofstream fout("Course enrolled of " + studentID + ".csv");*/
 	int option;
 	int i = user - 1;
 	int j = user - 1;
@@ -155,10 +159,11 @@ void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption, 
 					numOfOption++;
 					courseCur->NumOfStu++;
 					courseEnroll->NumOfStu = courseCur->NumOfStu;
-					fout << courseEnroll->CourseID << "," << courseEnroll->CourseName << ","
+					/*fout << courseEnroll->CourseID << "," << courseEnroll->CourseName << ","
 						<< courseEnroll->StaffName << "," << courseEnroll->NumOfCredit << ","
 						<< courseEnroll->NumOfStu << "," << courseEnroll->Day1 << ","
-						<< courseEnroll->Session1 << "," << courseEnroll->Day2 << "," << courseEnroll->Session2 << endl;
+						<< courseEnroll->Session1 << "," << courseEnroll->Day2 << "," << courseEnroll->Session2 << endl;*/
+					noEnroll++;
 					courseEnroll->CourseNext = NULL;
 				}
 				else {
@@ -173,12 +178,16 @@ void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption, 
 			}
 		}
 	}
+	no = noEnroll;
 }
 
-void viewListEnrollCourse(string studentID) {
+void viewListEnrollCourse(string studentID, int& no) {
+	string temp;
 	ifstream fin("Course enrolled of " + studentID + ".csv");
+	getline(fin, temp, ',');
+	int numOfSub = stoi(temp);
+	getline(fin, temp);
 	string courseID, nameCourse, nameTeacher, numOfStu, numOfCre, day1, session1, day2, session2;
-	int no = 1;
 	int y = 16, a = 20;
 	cout << endl;
 	gotoxy(8, 15);
@@ -197,10 +206,10 @@ void viewListEnrollCourse(string studentID) {
 	cout << "Number of students";
 	gotoxy(a, 15);
 	cout << "Day of week and session";
-	while (!fin.eof()) {
+	for (int i = 0 ; i < numOfSub ; i++) {
 		int x = 20;
 		gotoxy(6, y);
-		cout << no;
+		cout << i + 1;
 		gotoxy(8, y);
 		getline(fin, courseID, ',');
 		cout << courseID;
@@ -227,12 +236,11 @@ void viewListEnrollCourse(string studentID) {
 		getline(fin, session2);
 		cout << "On " << day1 << " in " << session1 << " and " << day2 << " in " << session2;
 		y = y + 1;
-		no++;
 		cout << endl;
 	}
 }
 
-void removeCourseEnrolled(Schoolyear* year, Course* course, int user) {
+void removeCourseEnrolled(Schoolyear* year, Course* course, int user, int& no) {
 	int i = user - 1;
 	int j = user - 1;
 	Data* infoCourseCur = NULL;
@@ -285,6 +293,7 @@ void removeCourseEnrolled(Schoolyear* year, Course* course, int user) {
 		courseCur->NumOfStu--;
 		year->Class[i].student[j].numOfSubject--;
 	}
+	no--;
 	cout << "Remove course you enrolled succesfully!!!" << endl;
 }
 

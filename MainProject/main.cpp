@@ -74,9 +74,10 @@ int main() {
 					createNewYear(schoolYear);
 				}
 				else {
+					int numOfSubStu;
 					if (checkUser == false) {
 						yearNode2 = yearHead1;
-						loadInfoCourse(yearNode2, semester);
+						loadInfoCourse(yearNode2, semester, numOfSubStu);
 					}
 					int optionEnroll;
 					while (true) {
@@ -88,18 +89,33 @@ int main() {
 						cin >> optionEnroll;
 						if (optionEnroll == 1) {
 							system("cls");
-							enrollCourse(yearNode1, yearNode2->semester[semester].course, user, yearNode1->Class[user - 1].student[user - 1].numOfSubject, yearNode1->Class[user - 1].student[user - 1].StudentID);
+							enrollCourse(yearNode1, yearNode2->semester[semester].course, user, yearNode1->Class[user - 1].student[user - 1].numOfSubject, numOfSubStu);
 						}
 						else if (optionEnroll == 2) {
 							system("cls");
-							viewListEnrollCourse(yearNode1->Class[user - 1].student[user - 1].StudentID);
+							int option2;
+							while (true) {
+								cout << "1. View list of your new enroll course." << endl;
+								cout << "2. View list of your old enroll course." << endl;
+								cout << "Enter your option: ";
+								cin >> option2;
+								if (option2 == 1) {
+									int numOfSubject;
+									viewCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, numOfSubject);
+									break;
+								}
+								else {
+									viewListEnrollCourse(yearNode1->Class[user - 1].student[user - 1].StudentID, numOfSubStu);
+									break;
+								}
+							}
 						}
 						else if (optionEnroll == 3) {
 							system("cls");
-							removeCourseEnrolled(yearNode1, yearNode2->semester[semester].course, user);
-							saveInfoCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, yearNode1->Class[user - 1].student[user - 1].StudentID);
+							removeCourseEnrolled(yearNode1, yearNode2->semester[semester].course, user, numOfSubStu);
 						}
 						else {
+							saveInfoCourse(yearNode1->Class[user - 1].student[user - 1].enrolled, yearNode1->Class[user - 1].student[user - 1].StudentID, numOfSubStu);
 							break;
 						}
 					}
@@ -115,7 +131,8 @@ int main() {
 					createNewClass(schoolYear, Class, numOfClass);
 				}
 				else {
-					viewListEnrollCourse(yearNode1->Class[user - 1].student[user - 1].StudentID);
+					int numOfSub;
+					viewListEnrollCourse(yearNode1->Class[user - 1].student[user - 1].StudentID, numOfSub);
 				}
 			}
 			else if (option == 5) {
@@ -194,7 +211,7 @@ int main() {
 							break;
 						}
 						else {
-							loadInfoCourse(yearNode2, semester);
+							loadInfoCourse(yearNode2, semester, numOfSubj);
 							int optionSub;
 							while (true) {
 								cout << "1. Add a course" << endl;

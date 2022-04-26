@@ -106,15 +106,15 @@ void deleteCourse(Schoolyear*&, int, int&);
 
 void saveInfoCourseStaff(Course*&, Schoolyear*&, int&, int&);
 
-void loadInfoCourse(Schoolyear*&, int&);
+void loadInfoCourse(Schoolyear*&, int&, int&);
 
-void saveInfoCourse(Course*&, string);
+void saveInfoCourse(Course*&, string, int&);
 
-void enrollCourse(Schoolyear*, Course*, int, int&, string);
+void enrollCourse(Schoolyear*, Course*, int, int&, int&);
 
-void viewListEnrollCourse(string);
+void viewListEnrollCourse(string, int&);
 
-void removeCourseEnrolled(Schoolyear*, Course*, int);
+void removeCourseEnrolled(Schoolyear*, Course*, int, int&);
 
 void viewListClasses(Class*&);
 
