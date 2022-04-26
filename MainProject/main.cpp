@@ -171,7 +171,7 @@ int main() {
 				if (user < 0) {
 					int option1;
 					while (true) {
-						cout << "1. Create a new semester." << endl;
+						cout << "1. Create a new course registration." << endl;
 						cout << "2. Load the old data." << endl;
 						cout << "Enter your option: ";
 						cin >> option1;
