@@ -14,7 +14,6 @@ Final Project - Programing Technique - A Course Registration System
 8. Update course information.
 9. Add a course to this semester
 10. View the list of courses.
-11. Enroll in a course
 
 - Nguyễn Văn Hiếu:
 1. Change password staff and student
@@ -23,9 +22,10 @@ Final Project - Programing Technique - A Course Registration System
 4. Create a course registration session
 5. Remove a course from the enrolled list.
 6. View the list of courses.
-7. View a list of enrolled courses.
-8. View a list of his/her courses.
-9. View a list of classes.
-10. View a list of students in a class 
-11. View a list of courses.
-12. View a list of students in a course
+7. Enroll in a course
+8. View a list of enrolled courses.
+9. View a list of his/her courses.
+10. View a list of classes.
+11. View a list of students in a class 
+12. View a list of courses.
+13. View a list of students in a course
