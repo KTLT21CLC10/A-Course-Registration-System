@@ -52,7 +52,7 @@ void loadInfoCourse(Schoolyear*& year, int& semester, int& no) {
 void saveInfoCourse(Course*& courseCur, string studentID, int& no) {
 	ofstream fout("Course enrolled of " + studentID + ".csv");
 	fout << no << ",,,,,,,," << endl;
-	while (courseCur != NULL) {
+	for (int i = 0;i < no;i++) {
 		fout << courseCur->CourseID << "," << courseCur->CourseName << ","
 			<< courseCur->StaffName << "," << courseCur->NumOfCredit << ","
 			<< courseCur->NumOfStu << "," << courseCur->Day1 << ","
@@ -63,7 +63,6 @@ void saveInfoCourse(Course*& courseCur, string studentID, int& no) {
 
 void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption, int& no) {
 	int noEnroll = 0;
-	/*ofstream fout("Course enrolled of " + studentID + ".csv");*/
 	int option;
 	int i = user - 1;
 	int j = user - 1;
@@ -159,10 +158,6 @@ void enrollCourse(Schoolyear* year, Course* course, int user, int& numOfOption, 
 					numOfOption++;
 					courseCur->NumOfStu++;
 					courseEnroll->NumOfStu = courseCur->NumOfStu;
-					/*fout << courseEnroll->CourseID << "," << courseEnroll->CourseName << ","
-						<< courseEnroll->StaffName << "," << courseEnroll->NumOfCredit << ","
-						<< courseEnroll->NumOfStu << "," << courseEnroll->Day1 << ","
-						<< courseEnroll->Session1 << "," << courseEnroll->Day2 << "," << courseEnroll->Session2 << endl;*/
 					noEnroll++;
 					courseEnroll->CourseNext = NULL;
 				}

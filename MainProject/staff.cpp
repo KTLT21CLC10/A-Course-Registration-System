@@ -703,7 +703,7 @@ void saveInfoCourseStaff(Course*& course, Schoolyear*& year, int& semester, int&
 	string temp;
 	ofstream fout("Data of " + year->schoolYear + "_" + to_string(semester + 1) + ".csv");
 	fout << numOfSubject << ",,,,,,,," << endl;
-	while (course != NULL) {
+	for (int i = 0;i < numOfSubject; i++) {
 		fout << course->CourseID << "," << course->CourseName << ","
 			<< course->StaffName << "," << course->NumOfCredit << ","
 			<< course->NumOfStu << "," << course->Day1 << ","
