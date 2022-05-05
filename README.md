@@ -6,14 +6,13 @@ Final Project - Programing Technique - A Course Registration System
 - Lương Gia Hy:
 1. Log in staff and student
 2. View info staff and student
-3. Change password staff
-4. Create several classes for 1st year students.
-5. Add new 1st year students to 1st-year classes
-6. Create a semester
-7. Add a course to this semester
-8. Update course information.
-9. Add a course to this semester
-10. View the list of courses.
+3. Create several classes for 1st year students.
+4. Add new 1st year students to 1st-year classes
+5. Create a semester
+6. Add a course to this semester
+7. Update course information.
+8. Add a course to this semester
+9. View the list of courses.
 
 - Nguyễn Văn Hiếu:
 1. Change password staff and student
