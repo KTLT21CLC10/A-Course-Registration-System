@@ -52,12 +52,13 @@ void loadInfoCourse(Schoolyear*& year, int& semester, int& no) {
 void saveInfoCourse(Course*& courseCur, string studentID, int& no) {
 	ofstream fout("Course enrolled of " + studentID + ".csv");
 	fout << no << ",,,,,,,," << endl;
+	Course* courseTemp = courseCur;
 	for (int i = 0;i < no;i++) {
-		fout << courseCur->CourseID << "," << courseCur->CourseName << ","
-			<< courseCur->StaffName << "," << courseCur->NumOfCredit << ","
-			<< courseCur->NumOfStu << "," << courseCur->Day1 << ","
-			<< courseCur->Session1 << "," << courseCur->Day2 << "," << courseCur->Session2 << endl;
-		courseCur = courseCur->CourseNext;
+		fout << courseTemp->CourseID << "," << courseTemp->CourseName << ","
+			<< courseTemp->StaffName << "," << courseTemp->NumOfCredit << ","
+			<< courseTemp->NumOfStu << "," << courseTemp->Day1 << ","
+			<< courseTemp->Session1 << "," << courseTemp->Day2 << "," << courseTemp->Session2 << endl;
+		courseTemp = courseTemp->CourseNext;
 	}
 }
 

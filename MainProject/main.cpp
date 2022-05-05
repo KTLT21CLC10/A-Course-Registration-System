@@ -249,8 +249,24 @@ int main() {
 					
 				}
 				else {
-					int numOfSubject;
-					viewCourse(yearNode2->semester[semester].course, numOfSubject);
+					int option1;
+					while (true) {
+						cout << "1. View a new course registration." << endl;
+						cout << "2. View a old course registration." << endl;
+						cout << "Enter your option: ";
+						cin >> option1;
+						if (option1 == 1) {
+							int numOfSubject;
+							viewCourse(yearNode2->semester[semester].course, numOfSubject);
+							break;
+						}
+						else {
+							int numOfSubject;
+							loadInfoCourse(yearNode2, semester, numOfSubj);
+							viewCourse(yearNode2->semester[semester].course, numOfSubject);
+							break;
+						}
+					}
 				}
 			}
 			else if (option == 8) {
